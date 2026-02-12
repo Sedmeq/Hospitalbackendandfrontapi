@@ -1,0 +1,269 @@
+using FluentValidation;
+using Hangfire;
+using Hospital.API.Middleware;
+using Hospital.Application.Common.Behaviors;
+using Hospital.Application.Common.Setting;
+using Hospital.Application.Features.Doctor.Command;
+using Hospital.Application.Interfaces;
+using Hospital.Domain.Entities;
+using Hospital.Infrastructure.BackgroundServices;
+using Hospital.Infrastructure.Persistence;
+using Hospital.Infrastructure.Repositories;
+using Hospital.Infrastructure.Services;
+using MediatR;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using Serilog;
+using StackExchange.Redis;
+using System.Net.Http.Headers;
+using System.Text;
+
+
+namespace Hospital.API
+{
+    public class Program
+    {
+        public static async Task Main(string[] args)
+        {
+            //-------------------logerging configuration
+            Log.Logger = new LoggerConfiguration()
+                         .ReadFrom.Configuration(new ConfigurationBuilder()
+                         .AddJsonFile("appsettings.json")
+                         .Build())
+                         .CreateLogger();
+
+
+            try
+            {
+                Log.Information("Application is starting up...");
+
+                var builder = WebApplication.CreateBuilder(args);
+                builder.Host.UseSerilog();
+                // --- Add services to the container ---
+                builder.Services.AddControllers();
+
+                builder.Services.AddCors(options =>
+                {
+                    options.AddPolicy("ReactCors", policy =>
+                    {
+                        policy
+                            .WithOrigins("http://localhost:5173",
+                            "http://127.0.0.1:5500")
+                            .AllowAnyHeader()
+                            .AllowAnyMethod();
+                    });
+                });
+
+
+                builder.Services.AddEndpointsApiExplorer();
+                builder.Services.AddSwaggerGen();
+
+                // --- Database Configuration ---
+                var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+                builder.Services.AddDbContext<AppDbContext>(options =>
+                    options.UseSqlServer(connectionString));
+
+                // --- Identity ---
+                builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+                    .AddEntityFrameworkStores<AppDbContext>()
+                     .AddDefaultTokenProviders(); ;
+
+                // --- MediatR and Validation Configuration ---
+                builder.Services.AddMediatR(cfg =>
+                    cfg.RegisterServicesFromAssembly(typeof(CreateDoctorCommand).Assembly));
+                builder.Services.AddValidatorsFromAssembly(typeof(CreateDoctorCommandValidator).Assembly);
+                builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+
+                // -- Handgire Configuration (background jobs)---
+                builder.Services.AddHangfire(config => config
+                    .UseSimpleAssemblyNameTypeSerializer()
+                    .UseRecommendedSerializerSettings()
+                     .UseSqlServerStorage(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+                //builder.Services.AddHttpClient<IAIChatService, AIChatService>(client =>
+                //{
+                //    client.BaseAddress = new Uri(builder.Configuration["AiSettings:OpenRouterBaseUrl"]);
+                //    client.DefaultRequestHeaders.Authorization =
+                //        new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", builder.Configuration["AiSettings:OpenRouterApiKey"]);
+                //    client.DefaultRequestHeaders.Add("HTTP-Referer", "http://localhost");
+                //});
+
+                builder.Services.AddHttpClient<IAIChatService, AIChatService>(client =>
+                {
+                    client.BaseAddress = new Uri(
+                        builder.Configuration["AiSettings:BaseUrl"]);
+
+                    client.DefaultRequestHeaders.Authorization =
+                        new AuthenticationHeaderValue(
+                            "Bearer",
+                            builder.Configuration["AiSettings:OpenRouterApiKey"]);
+
+                    client.DefaultRequestHeaders.Add("HTTP-Referer", "http://localhost");
+                    client.DefaultRequestHeaders.Add("Accept", "application/json");
+                });
+
+                builder.Services.AddHangfireServer();
+                builder.Services.AddHttpContextAccessor();
+
+                builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+                // --- Repositories and Services ---
+                builder.Services.AddScoped<IDoctorRepository, DoctorRepository>();
+                builder.Services.AddScoped<IDepartmentRepository, DepartmentRepository>();
+                builder.Services.AddScoped<IPatientRepository, PatientRepository>();
+                builder.Services.AddScoped<INurseRepository, NurseRepository>();
+                builder.Services.AddScoped<IPharmacistRepository, PharmacistRepository>();
+                builder.Services.AddScoped<IAccountantRepository, AccountantRepository>();
+                builder.Services.AddScoped<IAppointmentRepository, AppointmentRepository>();
+                builder.Services.AddScoped<IMedicineInventoryRepository, MedicineInventoryRepository>();
+                builder.Services.AddScoped<IStockAdjustmentRepository, StockAdjustmentRepository>();
+                builder.Services.AddScoped<IDispenseLogRepository, DispenseLogRepository>();
+                builder.Services.AddScoped<IPrescriptionRepository, PrescriptionRepository>();
+                builder.Services.AddScoped<IPrescribedMedicineRepository, PrescribedMedicineRepository>();
+                builder.Services.AddScoped<IEmailService, EmailService>();
+                builder.Services.AddScoped<INotificationService, NotificationService>();
+                builder.Services.AddScoped<IFileService, FileService>();
+                builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
+                builder.Services.AddScoped<ISliderRepository, SliderRepository>();
+                builder.Services.AddScoped<ITestimonialRepository, TestimonialRepository>();
+                builder.Services.AddScoped<IBlogRepository, BlogRepository>();
+                builder.Services.AddScoped<IBlogCommentRepository, BlogCommentRepository>();
+                builder.Services.AddScoped<IPartnersRepository, PartnersRepository>();
+                builder.Services.AddScoped<IAboutSectionRepository, AboutSectionRepository>();
+                builder.Services.AddScoped<IContactRepository, ContactRepository>();
+                builder.Services.AddScoped<IAboutRepository, AboutRepository>();
+                builder.Services.AddScoped<IContactInfoRepository, ContactInfoRepository>();
+
+                builder.Services.AddScoped<IDoctorEducationRepository, DoctorEducationRepository>();
+                builder.Services.AddScoped<IDoctorSkillRepository, DoctorSkillRepository>();
+
+
+                builder.Services.AddScoped<ITokenService, TokenService>();
+                builder.Services.AddScoped<IUserContextService, UserContextService>();
+                //builder.Services.AddScoped<IAIChatService, AIChatService>();
+                builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+                builder.Services.AddHostedService<AppointmentReminderBackgroundService>();
+
+
+
+                builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
+                    ConnectionMultiplexer.Connect(builder.Configuration.GetConnectionString("Redis")));
+                builder.Services.AddScoped<ICacheService, CacheService>();
+
+
+
+                // --- JWT Authentication ---
+                builder.Services.AddAuthentication(options =>
+                {
+                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                })
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+                        ValidAudience = builder.Configuration["Jwt:Audience"],
+                        IssuerSigningKey = new SymmetricSecurityKey(
+                            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+                    };
+                });
+
+                // Swagger
+                builder.Services.AddEndpointsApiExplorer();
+                builder.Services.AddSwaggerGen(swagger =>
+                {
+                    swagger.SwaggerDoc("v1", new OpenApiInfo
+                    {
+                        Version = "v1",
+                        Title = "Hospital Management System",
+                        Description = "API.Net"
+                    });
+
+                    swagger.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                    {
+                        Name = "Authorization",
+                        Type = SecuritySchemeType.ApiKey,
+                        Scheme = "Bearer",
+                        BearerFormat = "JWT",
+                        In = ParameterLocation.Header,
+                        Description = "Enter 'Bearer' [space] and then your valid token.\r\nExample: \"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9\""
+                    });
+
+                    swagger.AddSecurityRequirement(new OpenApiSecurityRequirement
+                    {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            }
+                        },
+                        new string[] {}
+                    }
+                    });
+                });
+
+
+
+                builder.Services.AddHttpClient();
+                builder.Services.AddHttpContextAccessor();
+
+                // --- Build the app ---
+                var app = builder.Build();
+
+
+                // Development environment configuration
+                if (app.Environment.IsDevelopment())
+                {
+                    //app.UseDeveloperExceptionPage();
+
+                    // Swagger middleware - only in development
+                    app.UseSwagger();
+                    app.UseSwaggerUI(c =>
+                    {
+                        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Hospital Management System API v1");
+                        c.RoutePrefix = "swagger"; 
+                        c.DocumentTitle = "API.Net";
+                    });
+                }
+
+
+                // --- Seed Roles ---
+                using (var scope = app.Services.CreateScope())
+                {
+                    await RolesSeeder.SeedRolesAsync(scope.ServiceProvider);
+                }
+
+                app.UseHangfireDashboard();
+                app.UseStaticFiles();
+
+                app.UseMiddleware<GlobalErrorHandlingMiddleware>();
+                app.UseCors("ReactCors");
+                app.UseAuthentication();
+                app.UseMiddleware<TokenBlacklistMiddleware>();
+                app.UseAuthorization();
+
+                app.MapControllers();
+
+                app.Run();
+            }
+            catch (Exception ex)
+            {
+                Log.Fatal(ex, "Application failed to start.");
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+        }
+    }
+}
