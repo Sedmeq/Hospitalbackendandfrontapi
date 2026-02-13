@@ -5,7 +5,8 @@ import { useToast } from '../../components/common/Toast';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import Modal from '../../components/common/Modal';
 
-const PrescriptionsList = () => {
+const PrescriptionsList = () =>
+{
     const [appointments, setAppointments] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
@@ -19,30 +20,38 @@ const PrescriptionsList = () => {
 
     useEffect(() => { loadAppointments(); }, []);
 
-    const loadAppointments = async () => {
-        try {
+    const loadAppointments = async () =>
+    {
+        try
+        {
             const response = await appointmentApi.getAllAppointments();
             setAppointments(response.data);
-        } catch (error) {
+        } catch (error)
+        {
             showToast('Error loading appointments', 'error');
-        } finally {
+        } finally
+        {
             setLoading(false);
         }
     };
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = async (e) =>
+    {
         e.preventDefault();
-        try {
+        try
+        {
             await prescriptionApi.createPrescription(formData);
             showToast('Prescription created successfully', 'success');
             setShowModal(false);
             setFormData({ appointmentId: '', diagnosis: '', notes: '', medicines: [{ medicineName: '', dosage: '', duration: '' }] });
-        } catch (error) {
+        } catch (error)
+        {
             showToast(error.response?.data?.message || 'Operation failed', 'error');
         }
     };
 
-    const addMedicine = () => {
+    const addMedicine = () =>
+    {
         setFormData({
             ...formData,
             medicines: [...formData.medicines, { medicineName: '', dosage: '', duration: '' }],
@@ -84,17 +93,20 @@ const PrescriptionsList = () => {
                         <label className="form-label">Medicines</label>
                         {formData.medicines.map((med, idx) => (
                             <div key={idx} className="grid grid-3 mb-sm">
-                                <input type="text" className="form-input" placeholder="Medicine Name" value={med.medicineName} onChange={(e) => {
+                                <input type="text" className="form-input" placeholder="Medicine Name" value={med.medicineName} onChange={(e) =>
+                                {
                                     const newMeds = [...formData.medicines];
                                     newMeds[idx].medicineName = e.target.value;
                                     setFormData({ ...formData, medicines: newMeds });
                                 }} required />
-                                <input type="text" className="form-input" placeholder="Dosage" value={med.dosage} onChange={(e) => {
+                                <input type="text" className="form-input" placeholder="Dosage" value={med.dosage} onChange={(e) =>
+                                {
                                     const newMeds = [...formData.medicines];
                                     newMeds[idx].dosage = e.target.value;
                                     setFormData({ ...formData, medicines: newMeds });
                                 }} required />
-                                <input type="text" className="form-input" placeholder="Duration" value={med.duration} onChange={(e) => {
+                                <input type="text" className="form-input" placeholder="Duration" value={med.duration} onChange={(e) =>
+                                {
                                     const newMeds = [...formData.medicines];
                                     newMeds[idx].duration = e.target.value;
                                     setFormData({ ...formData, medicines: newMeds });

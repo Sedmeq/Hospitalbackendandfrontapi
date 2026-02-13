@@ -36,9 +36,9 @@ namespace Hospital.Application.Features.Blog.Command
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             // Şəkil yükləmə
-            if (request.Image != null)
+            if (request.ImagePath != null)
             {
-                var imagePath = await _fileService.SaveBlogImageAsync(request.Image, blog.Id);
+                var imagePath = await _fileService.SaveBlogImageAsync(request.ImagePath, blog.Id);
                 blog.ImagePath = imagePath;
                 await _unitOfWork.Blogs.UpdateAsync(blog);
                 await _unitOfWork.SaveChangesAsync(cancellationToken);

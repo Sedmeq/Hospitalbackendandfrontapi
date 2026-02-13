@@ -5,8 +5,8 @@ import ProtectedRoute from './components/common/ProtectedRoute';
 import Layout from './components/layout/Layout';
 
 // Auth Pages
-import Login from './pages/auth/Login';
-import Register from './pages/auth/Register';
+// import Login from './pages/auth/Login';
+// import Register from './pages/auth/Register';
 
 // Dashboard
 import Dashboard from './pages/dashboard/Dashboard';
@@ -26,14 +26,15 @@ import ChatInterface from './pages/chat/ChatInterface';
 
 import './styles/index.css';
 
-function App() {
+function App()
+{
     return (
         <AuthProvider>
             <BrowserRouter>
                 <Routes>
                     {/* Public Routes */}
-                    <Route path="/login" element={<Login />} />
-                    <Route path="/register" element={<Register />} />
+                    {/* <Route path="/login" element={<Login />} />
+                    <Route path="/register" element={<Register />} /> */}
 
                     {/* Protected Routes */}
                     <Route

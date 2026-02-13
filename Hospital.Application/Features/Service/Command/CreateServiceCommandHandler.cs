@@ -32,9 +32,9 @@ namespace Hospital.Application.Features.Service.Command
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             // Şəkil yükləmə
-            if (request.Image != null)
+            if (request.ImagePath != null)
             {
-                var imagePath = await _fileService.SaveServiceImageAsync(request.Image, service.Id);
+                var imagePath = await _fileService.SaveServiceImageAsync(request.ImagePath, service.Id);
                 service.ImagePath = imagePath;
                 await _unitOfWork.Services.UpdateAsync(service);
                 await _unitOfWork.SaveChangesAsync(cancellationToken);

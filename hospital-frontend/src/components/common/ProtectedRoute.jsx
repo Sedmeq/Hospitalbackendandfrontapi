@@ -25,3 +25,19 @@ const ProtectedRoute = ({ children, requiredRole }) => {
 };
 
 export default ProtectedRoute;
+// import { useEffect } from "react";
+
+// export default function ProtectedRoute({ children }) {
+//   const token = localStorage.getItem("token");
+
+//   useEffect(() => {
+//     if (!token) {
+//       // React router ilə deyil, birbaşa browser redirect (loop olmur)
+//       window.location.replace("http://127.0.0.1:5500/novena/login.html");
+
+//     }
+//   }, [token]);
+
+//   if (!token) return null; // redirect edənə qədər boş render
+//   return children;
+// }

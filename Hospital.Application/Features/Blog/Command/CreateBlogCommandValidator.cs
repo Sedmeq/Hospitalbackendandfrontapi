@@ -17,7 +17,7 @@ namespace Hospital.Application.Features.Blog.Command
 
             RuleFor(x => x.Content)
                 .NotEmpty().WithMessage("Content is required.")
-                .MinimumLength(50).WithMessage("Content must be at least 50 characters.");
+                .WithMessage("Content must be at least 50 characters.");
 
             RuleFor(x => x.Author)
                 .NotEmpty().WithMessage("Author name is required.")

@@ -3,15 +3,18 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import './Layout.css';
 
-const Layout = ({ children }) => {
+const Layout = ({ children }) =>
+{
     const { user, logout, hasRole } = useAuth();
     const navigate = useNavigate();
     const location = useLocation();
     const [sidebarOpen, setSidebarOpen] = useState(true);
 
-    const handleLogout = async () => {
+    const handleLogout = async () =>
+    {
         await logout();
-        navigate('/login');
+        // Redirect to external URL after logout
+        window.location.href = 'http://127.0.0.1:5500/novena/index.html';
     };
 
     const menuItems = [

@@ -45,6 +45,17 @@ namespace Hospital.API.Middleware
                     response = new { error = notFoundException.Message };
                     break;
 
+                case UnauthorizedAccessException unauthorizedException:
+                    statusCode = HttpStatusCode.Unauthorized; // 401
+                    response = new { message = unauthorizedException.Message };
+                    break;
+
+                case EmailNotConfirmedException emailNotConfirmedException:
+                    statusCode = HttpStatusCode.Forbidden; // 403
+                    response = new { message = emailNotConfirmedException.Message };
+                    break;
+
+
                 default:
                     _logger.LogError(exception, "An unhandled exception has occurred.");
                     statusCode = HttpStatusCode.InternalServerError; // 500
