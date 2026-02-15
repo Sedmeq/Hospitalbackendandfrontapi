@@ -40,10 +40,75 @@ namespace Hospital.Application.Features.Appointment.Command
             // Doctor bu departmentə aiddir?
             if (doctor.DepartmentId != request.DepartmentId)
             {
-                throw new InvalidOperationException("Selected doctor does not belong to the selected department");
+                throw new BadRequestException("Selected doctor does not belong to the selected department");
             }
 
-            // Əgər PatientId göndərilibsə, Patient-i yoxla
+
+            // 4. Keçmişdə tarix seçilibmi?
+            if (request.Date.Date < DateTime.Now.Date)
+            {
+                throw new BadRequestException("Cannot book appointments in the past");
+            }
+
+            // *** YENİ: 5. Doctor həmin gün işləyirmi? ***
+            var dayOfWeek = request.Date.DayOfWeek;
+            var doctorSchedule = await _unitOfWork.DoctorSchedules
+                .GetScheduleByDoctorAndDayAsync(request.DoctorId, dayOfWeek);
+
+            if (doctorSchedule == null || !doctorSchedule.IsActive)
+            {
+                throw new BadRequestException(
+                    $"Doctor is not available on {dayOfWeek}. Please choose another day.");
+            }
+
+            // *** YENİ: 6. Seçilən vaxt doctor-un iş saatları arasındadır? ***
+            var requestedTime = TimeSpan.Parse(request.Time);
+
+            if (requestedTime < doctorSchedule.StartTime || requestedTime >= doctorSchedule.EndTime)
+            {
+                throw new BadRequestException(
+                    $"Selected time is outside doctor's working hours. " +
+                    $"Doctor works from {doctorSchedule.StartTime:hh\\:mm} to {doctorSchedule.EndTime:hh\\:mm} on {dayOfWeek}.");
+            }
+
+            // *** YENİ: 7. Seçilən vaxt slot müddətinə uyğundur? ***
+            var slotDuration = TimeSpan.FromMinutes(doctorSchedule.SlotDurationMinutes);
+            var scheduleStart = doctorSchedule.StartTime;
+
+            bool isValidSlot = false;
+            var currentSlot = scheduleStart;
+
+            while (currentSlot < doctorSchedule.EndTime)
+            {
+                if (currentSlot == requestedTime)
+                {
+                    isValidSlot = true;
+                    break;
+                }
+                currentSlot = currentSlot.Add(slotDuration);
+            }
+
+            if (!isValidSlot)
+            {
+                throw new BadRequestException(
+                    $"Selected time is not a valid slot. Doctor accepts appointments every {doctorSchedule.SlotDurationMinutes} minutes.");
+            }
+
+            // *** YENİ: 8. Bu vaxt artıq məşğuldur? ***
+            var existingAppointments = await _unitOfWork.Appointments.GetAllAsync();
+            var isTimeSlotTaken = existingAppointments.Any(a =>
+                a.DoctorId == request.DoctorId &&
+                a.Date.Date == request.Date.Date &&
+                a.Time == request.Time &&
+                a.Status != "Cancelled");
+
+            if (isTimeSlotTaken)
+            {
+                throw new BadRequestException(
+                    "This time slot is already booked. Please choose another time.");
+            }
+
+            // 9. Əgər PatientId göndərilibsə, Patient-i yoxla
             Domain.Entities.Patient? patient = null;
             if (request.PatientId.HasValue)
             {

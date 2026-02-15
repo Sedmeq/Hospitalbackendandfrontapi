@@ -41,6 +41,7 @@ namespace Hospital.Infrastructure.Persistence
 
         public DbSet<DoctorEducation> DoctorEducations { get; set; } // YENİ
         public DbSet<DoctorSkill> DoctorSkills { get; set; }
+        public DbSet<DoctorSchedule> DoctorSchedules { get; set; }
 
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
@@ -180,6 +181,13 @@ namespace Hospital.Infrastructure.Persistence
             builder.Entity<DoctorSkill>()
                 .HasOne(ds => ds.Doctor)
                 .WithMany(d => d.Skills)
+                .HasForeignKey(ds => ds.DoctorId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // YENİ: DoctorSchedule konfiqurasiyası
+            builder.Entity<DoctorSchedule>()
+                .HasOne(ds => ds.Doctor)
+                .WithMany(d => d.Schedules)
                 .HasForeignKey(ds => ds.DoctorId)
                 .OnDelete(DeleteBehavior.Cascade);
         }

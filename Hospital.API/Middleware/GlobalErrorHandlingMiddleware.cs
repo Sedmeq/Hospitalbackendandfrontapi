@@ -55,6 +55,11 @@ namespace Hospital.API.Middleware
                     response = new { message = emailNotConfirmedException.Message };
                     break;
 
+                case BadRequestException badRequestException:
+                    statusCode = HttpStatusCode.BadRequest;
+                    response = new { error = badRequestException.Message };
+                    break;
+
 
                 default:
                     _logger.LogError(exception, "An unhandled exception has occurred.");

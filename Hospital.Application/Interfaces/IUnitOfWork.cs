@@ -36,6 +36,8 @@ namespace Hospital.Application.Interfaces
         IDoctorEducationRepository DoctorEducations { get; } // YENİ
         IDoctorSkillRepository DoctorSkills { get; }
 
+        IDoctorScheduleRepository DoctorSchedules { get; } // YENİ
+
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
     }
 }

@@ -35,5 +35,8 @@ namespace Hospital.Domain.Entities
 
         public virtual ICollection<DoctorEducation> Educations { get; set; } = new List<DoctorEducation>();
         public virtual ICollection<DoctorSkill> Skills { get; set; } = new List<DoctorSkill>();
+
+        // YENİ: Doctor Schedule əlaqəsi
+        public virtual ICollection<DoctorSchedule> Schedules { get; set; } = new List<DoctorSchedule>();
     }
 }
