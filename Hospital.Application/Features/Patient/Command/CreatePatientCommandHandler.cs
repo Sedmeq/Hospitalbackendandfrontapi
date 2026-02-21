@@ -29,7 +29,10 @@ namespace Hospital.Application.Features.Patient.Command
                 LastName = request.LastName,
                 UserName = request.Email,
                 Email = request.Email,
-                PhoneNumber = request.Phone
+                PhoneNumber = request.Phone,
+                EmailConfirmed = true
+
+
 
             };
            

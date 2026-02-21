@@ -21,6 +21,7 @@ namespace Hospital.Infrastructure.Services
         private const string PartnersFolder = "partners";
         private const string AboutSectionFolder = "aboutSection";
         private const string AboutFolder = "about";
+        private const string ContactInfoFolder = "Logo"; // YENİ
         private readonly string[] _allowedExtensions = { ".jpg", ".jpeg", ".png", ".gif" };
         private const long MaxFileSize = 5 * 1024 * 1024; // 5 MB
 
@@ -166,6 +167,22 @@ namespace Hospital.Infrastructure.Services
         {
             return GetImageUrl(imagePath);
         }
+
+
+        // Metodun içində qovluq adını "contactInfo" kimi təyin edirik
+        public async Task<string> SaveContactInfoImageAsync(IFormFile file, int contactInfoId)
+        {
+            return await SaveImageAsync(file, ContactInfoFolder, $"contactinfo_{contactInfoId}");
+        }
+        public async Task<bool> DeleteContactInfoImageAsync(string imagePath)
+        {
+            return await DeleteImageAsync(imagePath);
+        }
+        public string GetContactInfoImageUrl(string imagePath)
+        {
+            return GetImageUrl(imagePath);
+        }
+
 
         // Ümumi metodlar (kod təkrarını azaltmaq üçün)
         private async Task<string> SaveImageAsync(IFormFile file, string folderName, string filePrefix)

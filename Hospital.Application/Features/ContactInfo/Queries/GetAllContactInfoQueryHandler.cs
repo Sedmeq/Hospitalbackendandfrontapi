@@ -28,7 +28,8 @@ namespace Hospital.Application.Features.ContactInfo.Queries
                 Email = info.Email,
                 Address = info.Address,
                 PhoneNumber = info.PhoneNumber,
-                Time = info.Time
+                Time = info.Time,
+                Logo = info.Logo
             }).ToList();
         }
     }

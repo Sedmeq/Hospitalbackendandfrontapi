@@ -13,10 +13,12 @@ namespace Hospital.Application.Features.ContactInfo.Command
     public class UpdateContactInfoCommandHandler : IRequestHandler<UpdateContactInfoCommand, ContactInfoDto>
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IFileService _fileService;
 
-        public UpdateContactInfoCommandHandler(IUnitOfWork unitOfWork)
+        public UpdateContactInfoCommandHandler(IUnitOfWork unitOfWork, IFileService fileService)
         {
             _unitOfWork = unitOfWork;
+            _fileService = fileService;
         }
 
         public async Task<ContactInfoDto> Handle(UpdateContactInfoCommand request, CancellationToken cancellationToken)
@@ -32,6 +34,22 @@ namespace Hospital.Application.Features.ContactInfo.Command
             contactInfo.PhoneNumber = request.PhoneNumber;
             contactInfo.Time = request.Time;
 
+
+            // LOGO MƏNTİQİ
+            if (request.RemoveLogo && !string.IsNullOrEmpty(contactInfo.Logo))
+            {
+                await _fileService.DeleteContactInfoImageAsync(contactInfo.Logo);
+                contactInfo.Logo = string.Empty;
+            }
+            else if (request.Logo != null)
+            {
+                if (!string.IsNullOrEmpty(contactInfo.Logo))
+                {
+                    await _fileService.DeleteContactInfoImageAsync(contactInfo.Logo);
+                }
+                contactInfo.Logo = await _fileService.SaveContactInfoImageAsync(request.Logo, contactInfo.Id);
+            }
+
             await _unitOfWork.ContactInfos.UpdateAsync(contactInfo);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
@@ -41,7 +59,8 @@ namespace Hospital.Application.Features.ContactInfo.Command
                 Email = contactInfo.Email,
                 Address = contactInfo.Address,
                 PhoneNumber = contactInfo.PhoneNumber,
-                Time = contactInfo.Time
+                Time = contactInfo.Time,
+                Logo = contactInfo.Logo
             };
         }
     }

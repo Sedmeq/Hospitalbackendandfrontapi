@@ -136,7 +136,7 @@ QAYDALAR:
                     new { role = "system", content = systemPrompt },
                     new { role = "user", content = patientSymptoms }
                 },
-                max_tokens = 100,
+                max_tokens = 300,
                 temperature = 0
             };
 

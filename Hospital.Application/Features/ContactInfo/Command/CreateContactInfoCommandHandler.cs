@@ -1,5 +1,6 @@
 ﻿using Hospital.Application.DTOs;
 using Hospital.Application.Interfaces;
+using Hospital.Domain.Entities;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -12,10 +13,12 @@ namespace Hospital.Application.Features.ContactInfo.Command
     public class CreateContactInfoCommandHandler : IRequestHandler<CreateContactInfoCommand, ContactInfoDto>
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IFileService _fileService;
 
-        public CreateContactInfoCommandHandler(IUnitOfWork unitOfWork)
+        public CreateContactInfoCommandHandler(IUnitOfWork unitOfWork, IFileService fileService)
         {
             _unitOfWork = unitOfWork;
+            _fileService = fileService;
         }
 
         public async Task<ContactInfoDto> Handle(CreateContactInfoCommand request, CancellationToken cancellationToken)
@@ -28,8 +31,20 @@ namespace Hospital.Application.Features.ContactInfo.Command
                 Time = request.Time
             };
 
+
+
             await _unitOfWork.ContactInfos.AddAsync(contadctInfo);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+            if(contadctInfo != null) {
+                if (request.Logo != null)
+                {
+                    var filePath = await _fileService.SaveContactInfoImageAsync(request.Logo, contadctInfo.Id);
+                    contadctInfo.Logo = filePath;
+                    await _unitOfWork.ContactInfos.UpdateAsync(contadctInfo);
+                    await _unitOfWork.SaveChangesAsync(cancellationToken);
+                }
+            }
 
             return new ContactInfoDto
             {
@@ -37,7 +52,8 @@ namespace Hospital.Application.Features.ContactInfo.Command
                 Email = contadctInfo.Email,
                 Address = contadctInfo.Address,
                 PhoneNumber = contadctInfo.PhoneNumber,
-                Time = contadctInfo.Time
+                Time = contadctInfo.Time,
+                Logo = contadctInfo.Logo
             };
         }
     }

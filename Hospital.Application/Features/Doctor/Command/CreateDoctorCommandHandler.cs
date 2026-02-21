@@ -33,8 +33,9 @@ namespace Hospital.Application.Features.Doctor.Command
                 LastName = request.LastName,
                 UserName = request.Email,
                 Email = request.Email,
-               PhoneNumber=request.Phone
-               
+               PhoneNumber=request.Phone,
+               EmailConfirmed= true
+
             };
             var newDoctorProfile = new Domain.Entities.Doctor
             {

@@ -1,5 +1,6 @@
 ﻿using Hospital.Application.DTOs;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,5 +15,8 @@ namespace Hospital.Application.Features.ContactInfo.Command
         public string Address { get; set; } = string.Empty;
         public string PhoneNumber { get; set; } = string.Empty;
         public string Time { get; set; } = string.Empty;
+
+        // Yeni
+        public IFormFile? Logo { get; set; }
     }
 }

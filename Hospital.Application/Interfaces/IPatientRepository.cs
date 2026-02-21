@@ -12,6 +12,7 @@ namespace Hospital.Application.Interfaces
         Task<Patient?> GetPatientByName(string name);
 
         Task<Patient?> GetPatientHistoryAsync(int id);
+        Task<Patient?> GetByUserIdAsync(string userId);
     }
 
 

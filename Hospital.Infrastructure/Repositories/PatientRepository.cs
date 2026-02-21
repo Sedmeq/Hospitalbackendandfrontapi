@@ -26,8 +26,19 @@ namespace Hospital.Infrastructure.Repositories
 
         public async Task<Patient?> GetByUserIdAsync(string userId)
         {
-            return await _context.Patients.FirstOrDefaultAsync(d => d.ApplicationUserId == userId);
+            return await _context.Patients
+                .Include(p => p.ApplicationUser)
+                .FirstOrDefaultAsync(p => p.ApplicationUserId == userId);
         }
+
+
+        //new added metod
+        //public async Task<Patient?> GetPatientByIdAsync(string userId)
+        //{
+        //    return await _context.Patients
+        //        .Include(p => p.ApplicationUser)
+        //        .FirstOrDefaultAsync(p => p.ApplicationUserId == userId);
+        //}
 
         public async Task<Patient?> GetPatientByName(string name)
         {

@@ -41,5 +41,12 @@ namespace Hospital.API.Controllers
             });
             return Ok(result);
         }
+
+        [HttpDelete("DeleteSchedule/{id}")]
+        public async Task<IActionResult> DeleteSchedule(int id)
+        {
+            var result = await _mediator.Send(new DeleteDoctorScheduleCommand { Id = id });
+            return Ok(result);
+        }
     }
 }

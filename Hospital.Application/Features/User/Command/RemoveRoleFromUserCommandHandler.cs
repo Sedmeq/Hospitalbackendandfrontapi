@@ -63,7 +63,6 @@ namespace Hospital.Application.Features.User.Command
                     break;
 
                 // Patient
-                // بصراحه انا مش شايفه حل حلو ان اعمل سويتش بس دا الي جي في بالي دلوقت
                
             }
             await _unitOfWork.SaveChangesAsync();

@@ -15,10 +15,12 @@ namespace Hospital.Application.Features.Appointment.Command
     public class BookAppointmentCommandHandler : IRequestHandler<BookAppointmentCommand, AppointmentDto>
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IUserContextService _userContextService;
 
-        public BookAppointmentCommandHandler(IUnitOfWork unitOfWork)
+        public BookAppointmentCommandHandler(IUnitOfWork unitOfWork, IUserContextService userContextService)
         {
             _unitOfWork = unitOfWork;
+            _userContextService = userContextService;
         }
 
         public async Task<AppointmentDto> Handle(BookAppointmentCommand request, CancellationToken cancellationToken)
@@ -109,15 +111,28 @@ namespace Hospital.Application.Features.Appointment.Command
             }
 
             // 9. Əgər PatientId göndərilibsə, Patient-i yoxla
-            Domain.Entities.Patient? patient = null;
-            if (request.PatientId.HasValue)
+            //Domain.Entities.Patient? patient = null;
+            //if (request.PatientId.HasValue)
+            //{
+            //    patient = await _unitOfWork.Patients.GetByIdAsync(request.PatientId.Value);
+            //    if (patient == null)
+            //    {
+            //        throw new NotFoundException("Patient not found");
+            //    }
+            //}
+            // ✅ Login olmuş user-in patient profilini tap
+            var userId = _userContextService.GetUserId();
+            if (string.IsNullOrEmpty(userId))
             {
-                patient = await _unitOfWork.Patients.GetByIdAsync(request.PatientId.Value);
-                if (patient == null)
-                {
-                    throw new NotFoundException("Patient not found");
-                }
+                throw new UnauthorizedAccessException("User is not authenticated.");
             }
+
+            var patient = await _unitOfWork.Patients.GetByUserIdAsync(userId);
+            if (patient == null)
+            {
+                throw new NotFoundException("Patient profile not found for this user.");
+            }
+
 
             // Appointment yarat
             var newAppointment = new Domain.Entities.Appointment
@@ -129,7 +144,9 @@ namespace Hospital.Application.Features.Appointment.Command
                 PatientPhone = request.PatientPhone,
                 Message = request.Message,
                 DoctorId = request.DoctorId,
-                PatientId = request.PatientId,
+                //PatientId = request.PatientId,
+                PatientId = patient.Id,
+
                 DepartmentId = request.DepartmentId
             };
 
@@ -148,9 +165,11 @@ namespace Hospital.Application.Features.Appointment.Command
                 DoctorId = doctor.Id,
                 DoctorName = $"{doctor.ApplicationUser.FirstName} {doctor.ApplicationUser.LastName}",
                 PatientId = newAppointment.PatientId,
-                RegisteredPatientName = patient != null
-                    ? $"{patient.ApplicationUser.FirstName} {patient.ApplicationUser.LastName}"
-                    : null,
+                //RegisteredPatientName = patient != null
+                //    ? $"{patient.ApplicationUser.FirstName} {patient.ApplicationUser.LastName}"
+                //    : null,
+                RegisteredPatientName = $"{patient.ApplicationUser.FirstName} {patient.ApplicationUser.LastName}",
+
                 DepartmentId = department.Id,
                 DepartmentName = department.Name
             };

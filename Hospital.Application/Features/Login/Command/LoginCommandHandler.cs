@@ -38,6 +38,15 @@ namespace Hospital.Application.Features.Login.Command
                 _logger.LogWarning("Login failed for user {Email}", request.Email);
                 throw new UnauthorizedAccessException("Invalid email or password.");
             }
+
+            // 2. YENİ HİSSƏ: Bloklanma (Lockout) yoxlanışı
+            if (await _userManager.IsLockedOutAsync(user))
+            {
+                _logger.LogWarning("User {Email} is locked out attempting to login.", request.Email);
+                // İstersəniz burada xüsusi bir exception da ata bilərsiniz
+                throw new UnauthorizedAccessException("Account is locked. Please contact admin.");
+            }
+
             if (!await _userManager.IsEmailConfirmedAsync(user))
             {
                 _logger.LogWarning("Login failed for user {Email}", request.Email);
