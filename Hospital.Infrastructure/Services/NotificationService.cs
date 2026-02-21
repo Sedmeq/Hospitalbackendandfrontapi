@@ -92,7 +92,35 @@ namespace Hospital.Infrastructure.Services
         }
 
 
+        // Hospital.Infrastructure/Services/NotificationService.cs
+        public async Task SendAppointmentConfirmedAsync(string patientEmail, string patientName, string doctorName, DateTime appointmentDate, string appointmentTime)
+        {
+            using (var smtp = new SmtpClient(_emailSettings.SmtpServer, _emailSettings.Port))
+            {
+                smtp.Credentials = new NetworkCredential(_emailSettings.SenderEmail, _emailSettings.Password);
+                smtp.EnableSsl = true;
 
+                var mail = new MailMessage
+                {
+                    From = new MailAddress(_emailSettings.SenderEmail, _emailSettings.SenderName),
+                    Subject = "[Appointment Confirmed] - Your appointment has been confirmed",
+                    Body = $@"<h2>Appointment Confirmed ✅</h2>
+                     <p>Dear <strong>{patientName}</strong>,</p>
+                     <p>Your appointment has been <strong>confirmed</strong> by your doctor.</p>
+                     <table border='1' cellpadding='8' style='border-collapse:collapse;'>
+                         <tr><td><strong>Doctor</strong></td><td>{doctorName}</td></tr>
+                         <tr><td><strong>Date</strong></td><td>{appointmentDate:dd MMMM yyyy}</td></tr>
+                         <tr><td><strong>Time</strong></td><td>{appointmentTime}</td></tr>
+                     </table>
+                     <p>Please be on time. If you need to cancel, contact us as soon as possible.</p>
+                     <p>Thank you,<br/><em>Hospital Management System</em></p>",
+                    IsBodyHtml = true
+                };
+                mail.To.Add(patientEmail);
+
+                await smtp.SendMailAsync(mail);
+            }
+        }
 
 
     }

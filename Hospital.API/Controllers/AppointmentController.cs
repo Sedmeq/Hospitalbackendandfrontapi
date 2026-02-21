@@ -89,5 +89,15 @@ namespace Hospital.API.Controllers
             var result = await _mediator.Send(new GetDoctorsByDepartmentQuery { DepartmentId = departmentId });
             return Ok(result);
         }
+
+
+
+        [HttpPut("ConfirmAppointment/{id}")]
+        [Authorize(Roles = "Admin,Doctor")]
+        public async Task<IActionResult> ConfirmAppointment(int id)
+        {
+            var result = await _mediator.Send(new ConfirmAppointmentCommand { AppointmentId = id });
+            return Ok(result);
+        }
     }
 }
