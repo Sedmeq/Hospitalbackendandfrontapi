@@ -10,5 +10,7 @@ namespace Hospital.Application.Interfaces
     {
         Task SendConfirmationEmailAsync(string email, string userId, string token, string baseUrl);
         Task SendRemindersForUpcomingAppointmentsAsync();
+
+        Task SendPasswordResetEmailAsync(string email, string userId, string token, string baseUrl); // YENİ
     }
 }

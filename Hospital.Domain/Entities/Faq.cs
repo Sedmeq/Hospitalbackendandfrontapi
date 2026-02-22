@@ -6,7 +6,18 @@ using System.Threading.Tasks;
 
 namespace Hospital.Domain.Entities
 {
-    internal class Faq
+    public class Faq
     {
+        public int Id { get; set; }
+
+        public string Question { get; set; }
+        public string Answer { get; set; }
+
+        public bool IsActive { get; set; } = true;
+
+        public int Order { get; set; }  // sıralama üçün
+
+        public DateTime CreatedAt { get; set; }
+        public DateTime? UpdatedAt { get; set; }
     }
 }

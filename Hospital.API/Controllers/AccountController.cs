@@ -1,16 +1,18 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using MediatR;
-using Microsoft.AspNetCore.Identity;
-using Hospital.Domain.Entities;
-using Microsoft.Data.SqlClient;
-using Hospital.Application.Features.Login.Command;
-using Hospital.Application.Features.Register.Command;
-using Hospital.Application.Interfaces;
-using Hospital.Application.DTOs;
-using Hospital.Application.Features.Logout;
-using Microsoft.AspNetCore.Authorization;
+﻿using Hospital.Application.DTOs;
 using Hospital.Application.Features.ChangePassword.Command;
+using Hospital.Application.Features.ForgotPassword.Command;
+using Hospital.Application.Features.Login.Command;
+using Hospital.Application.Features.Logout;
+using Hospital.Application.Features.Register.Command;
+using Hospital.Application.Features.ResetPassword.Command;
+using Hospital.Application.Interfaces;
+using Hospital.Domain.Entities;
+using MediatR;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 
 namespace Hospital.API.Controllers
 {
@@ -90,6 +92,29 @@ namespace Hospital.API.Controllers
 
 
 
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordCommand command)
+        {
+            await _mediator.Send(command);
+            // Security: həmişə eyni mesaj qaytar
+            return Ok("If an account with that email exists, a password reset link has been sent.");
+        }
+
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordCommand command)
+        {
+            var result = await _mediator.Send(command);
+            return Ok("Password has been reset successfully.");
+        }
+
+        // Əgər email link ilə GET istəyi gəlirsə (optional):
+        [HttpGet("reset-password")]
+        public async Task<IActionResult> ResetPasswordRedirect([FromQuery] string userId, [FromQuery] string token)
+        {
+            // React frontend-ə yönləndir
+            var redirectUrl = $"http://localhost:5173/reset-password?userId={userId}&token={token}";
+            return Redirect(redirectUrl);
+        }
 
     }
 }
