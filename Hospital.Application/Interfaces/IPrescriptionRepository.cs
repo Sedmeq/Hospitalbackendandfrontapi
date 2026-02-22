@@ -7,7 +7,13 @@ using Hospital.Domain.Entities;
 
 namespace Hospital.Application.Interfaces
 {
-    public interface IPrescriptionRepository : IGenericRepository<Prescription>
+    public interface IPrescriptionRepository
     {
+        Task<Prescription> GetByIdAsync(int id);
+        Task<IEnumerable<Prescription>> GetByPatientIdAsync(int patientId);
+        Task AddAsync(Prescription prescription);
+        Task UpdateAsync(Prescription prescription);
+
+        Task<Prescription?> GetByAppointmentIdAsync(int appointmentId);
     }
 }

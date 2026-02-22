@@ -14,6 +14,8 @@ namespace Hospital.Domain.Entities
 
         public bool IsSold { get; set; } = false; // to prevent Idempotency Error
 
+        public string? PdfPath { get; set; }
+
         public int DoctorId { get; set; }
         public virtual Doctor Doctor { get; set; }
 

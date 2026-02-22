@@ -39,6 +39,7 @@
     <Folder Include="wwwroot\images\services\" />
     <Folder Include="wwwroot\images\sliders\" />
     <Folder Include="wwwroot\images\testimonials\" />
+    <Folder Include="wwwroot\prescriptions\" />
   </ItemGroup>
 
 </Project>

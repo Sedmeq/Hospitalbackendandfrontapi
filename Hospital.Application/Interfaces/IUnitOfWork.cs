@@ -38,6 +38,7 @@ namespace Hospital.Application.Interfaces
 
         IDoctorScheduleRepository DoctorSchedules { get; } // YENİ
 
+
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
     }
 }

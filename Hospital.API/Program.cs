@@ -141,6 +141,8 @@ namespace Hospital.API
                 builder.Services.AddScoped<IDoctorSkillRepository, DoctorSkillRepository>();
                 builder.Services.AddScoped<IDoctorScheduleRepository, DoctorScheduleRepository>();
 
+                builder.Services.AddScoped<IPdfService, PdfService>();
+
 
                 builder.Services.AddScoped<ITokenService, TokenService>();
                 builder.Services.AddScoped<IUserContextService, UserContextService>();

@@ -42,16 +42,32 @@ namespace Hospital.API.Controllers
         }
 
 
+        //[HttpGet("confirm-email")]
+        //public async Task<IActionResult> ConfirmEmail([FromQuery] ConfirmEmailCommand command)
+        //{
+        //    var result = await _mediator.Send(command);
+        //    if (result)
+        //    {
+        //        return Ok("Email confirmed successfully.");
+        //    }
+        //    return BadRequest("Email could not be confirmed.");
+        //}
+
         [HttpGet("confirm-email")]
         public async Task<IActionResult> ConfirmEmail([FromQuery] ConfirmEmailCommand command)
         {
             var result = await _mediator.Send(command);
+
+            // React login URL (öz portunu yaz)
+            var loginUrlSuccess = "http://localhost:5173/login?verified=true";
+            var loginUrlFail = "http://localhost:5173/login?verified=false";
+
             if (result)
-            {
-                return Ok("Email confirmed successfully.");
-            }
-            return BadRequest("Email could not be confirmed.");
+                return Redirect(loginUrlSuccess);
+
+            return Redirect(loginUrlFail);
         }
+
 
 
         [HttpPost("change-password")]
