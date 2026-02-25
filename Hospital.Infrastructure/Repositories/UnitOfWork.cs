@@ -45,6 +45,7 @@ namespace Hospital.Infrastructure.Repositories
         public IDoctorSkillRepository DoctorSkills { get; private set; }
 
         public IDoctorScheduleRepository DoctorSchedules { get; private set; } // YENİ
+        public IFaqRepository Faqs { get; private set; } // YENİ
 
 
         public UnitOfWork(
@@ -73,6 +74,7 @@ namespace Hospital.Infrastructure.Repositories
             IContactInfoRepository contactInfos,
             IDoctorEducationRepository doctorEducations, // YENİ
         IDoctorSkillRepository doctorSkills,
+        IFaqRepository faqs, // YENİ
          IDoctorScheduleRepository doctorSchedules // YENİ
         )
         {
@@ -103,6 +105,7 @@ namespace Hospital.Infrastructure.Repositories
             ContactInfos = contactInfos;
             DoctorEducations = doctorEducations; // YENİ
             DoctorSkills = doctorSkills;
+            Faqs = faqs; // YENİ
 
             DoctorSchedules = doctorSchedules; // YENİ
         }

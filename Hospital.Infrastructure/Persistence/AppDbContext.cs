@@ -42,10 +42,12 @@ namespace Hospital.Infrastructure.Persistence
         public DbSet<DoctorEducation> DoctorEducations { get; set; } // YENİ
         public DbSet<DoctorSkill> DoctorSkills { get; set; }
         public DbSet<DoctorSchedule> DoctorSchedules { get; set; }
+        public DbSet<Faq> Faqs { get; set; }
 
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
         }
+
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -190,6 +192,10 @@ namespace Hospital.Infrastructure.Persistence
                 .WithMany(d => d.Schedules)
                 .HasForeignKey(ds => ds.DoctorId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+
+
+
         }
     }
 

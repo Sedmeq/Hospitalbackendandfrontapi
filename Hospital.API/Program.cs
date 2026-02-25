@@ -142,6 +142,7 @@ namespace Hospital.API
                 builder.Services.AddScoped<IDoctorScheduleRepository, DoctorScheduleRepository>();
 
                 builder.Services.AddScoped<IPdfService, PdfService>();
+                builder.Services.AddScoped<IFaqRepository, FaqRepository>();
 
 
                 builder.Services.AddScoped<ITokenService, TokenService>();
@@ -177,7 +178,13 @@ namespace Hospital.API
                         IssuerSigningKey = new SymmetricSecurityKey(
                             Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
                     };
-                });
+                })
+
+                .AddGoogle(options =>                        
+                 {
+                     options.ClientId = builder.Configuration["Authentication:Google:ClientId"];
+                     options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+                 });
 
                 // Swagger
                 builder.Services.AddEndpointsApiExplorer();

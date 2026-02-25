@@ -1,6 +1,7 @@
 ﻿using Hospital.Application.DTOs;
 using Hospital.Application.Features.ChangePassword.Command;
 using Hospital.Application.Features.ForgotPassword.Command;
+using Hospital.Application.Features.GoogleAuth.Command;
 using Hospital.Application.Features.Login.Command;
 using Hospital.Application.Features.Logout;
 using Hospital.Application.Features.Register.Command;
@@ -79,6 +80,17 @@ namespace Hospital.API.Controllers
             var result = await _mediator.Send(command);
             return Ok(result);
         }
+
+
+
+        [HttpPost("google-signin")]
+        public async Task<IActionResult> GoogleSignIn([FromBody] GoogleSignInRequest request)
+        {
+            var command = new GoogleSignInCommand { IdToken = request.IdToken };
+            var result = await _mediator.Send(command);
+            return Ok(result);
+        }
+
 
 
 

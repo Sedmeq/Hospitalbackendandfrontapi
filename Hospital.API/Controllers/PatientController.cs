@@ -54,9 +54,13 @@ namespace Hospital.API.Controllers
             return Ok(result);
         }
 
-        [HttpPut("UpdatePatient/{id}")]
+        [HttpPut("UpdatePatient/{id:int}")]
         public async Task<IActionResult> UpdatePatient(int id, [FromBody] UpdatePatientCommand command)
         {
+            if (command.Id != 0 && command.Id != id)
+                return BadRequest("Route id and body id do not match.");
+
+            command.Id = id;
             var result = await _mediator.Send(command);
             return Ok(result);
         }

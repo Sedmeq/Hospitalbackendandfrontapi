@@ -28,6 +28,7 @@ namespace Hospital.Application.Features.Patient.Command
             patient.ApplicationUser.LastName = command.LastName;
             patient.ApplicationUser.Email = command.Email;
             patient.Email = command.Email;
+            patient.Phone = command.Phone;
             patient.ApplicationUser.PhoneNumber = command.Phone;
             patient.Address = command.Address;
             patient.City = command.City;

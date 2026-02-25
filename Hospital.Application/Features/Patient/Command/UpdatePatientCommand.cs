@@ -10,16 +10,14 @@ namespace Hospital.Application.Features.Patient.Command
 {
     public class UpdatePatientCommand : IRequest<PatientsDto>
     {
-        public int Id { get; set; }
+        public int Id { get; set; } // controller route-dan dolduracaq
         public required string FirstName { get; set; }
         public required string LastName { get; set; }
         public required string Email { get; set; }
-       
         public required string Phone { get; set; }
         public DateTime DateOfBirth { get; set; }
         public string? Address { get; set; }
         public required string City { get; set; }
-
         public required string Gender { get; set; }
     }
 }
