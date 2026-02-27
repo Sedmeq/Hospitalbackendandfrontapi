@@ -31,6 +31,7 @@ namespace Hospital.Application.Features.Patient.Queries
                 Gender = x.Gender,
                 City = x.City,
                 Address = x.Address,
+                ImagePath = x.ImagePath,
                 DateOfBirth = x.DateOfBirth
                 
             });

@@ -14,11 +14,13 @@ namespace Hospital.Application.Features.Patient.Command
     public class CreatePatientCommandHandler  : IRequestHandler<CreatePatientCommand, int>
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly UserManager<ApplicationUser> _userManager;    
-        public CreatePatientCommandHandler(IUnitOfWork unitOfWork, UserManager<ApplicationUser> userManager)
+        private readonly UserManager<ApplicationUser> _userManager;  
+        private readonly IFileService _fileService;
+        public CreatePatientCommandHandler(IUnitOfWork unitOfWork, UserManager<ApplicationUser> userManager, IFileService fileService)
         {
             _unitOfWork = unitOfWork;
             _userManager = userManager;
+            _fileService = fileService;
         }
 
         public async Task<int> Handle (CreatePatientCommand request, CancellationToken cancellationToken)
@@ -55,6 +57,13 @@ namespace Hospital.Application.Features.Patient.Command
             await _userManager.AddToRoleAsync(newUser, "Patient");
             await _unitOfWork.Patients.AddAsync(newPatientProfile);
             await _unitOfWork.SaveChangesAsync();
+
+            if (request.Image != null)
+            {
+                var imagePath = await _fileService.SavePatientImageAsync(request.Image, newPatientProfile.Id);
+                newPatientProfile.ImagePath = imagePath;
+                await _unitOfWork.SaveChangesAsync();
+            }
 
             return newPatientProfile.Id;
 

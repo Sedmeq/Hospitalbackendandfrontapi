@@ -33,6 +33,7 @@ namespace Hospital.Application.Features.Patient.Queries
                 Phone = patient.Phone,
                 Address = patient.Address,
                 City = patient.City,
+                ImagePath = patient.ImagePath,
                 DateOfBirth = patient.DateOfBirth
 
             };

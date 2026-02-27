@@ -9,12 +9,10 @@ using System.Threading.Tasks;
 
 namespace Hospital.Application.Features.Patient.Command
 {
-    public class UpdatePatientCommand : IRequest<PatientsDto>
+    public class UpdateMyProfileCommand : IRequest<PatientsDto>
     {
-        public int Id { get; set; }
         public string FirstName { get; set; } = string.Empty;
         public string LastName { get; set; } = string.Empty;
-        public string Email { get; set; } = string.Empty;
         public string Phone { get; set; } = string.Empty;
         public DateTime DateOfBirth { get; set; }
         public string? Address { get; set; }

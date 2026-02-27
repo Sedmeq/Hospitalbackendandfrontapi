@@ -1,21 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Azure.Core;
 using Hospital.Application.DTOs;
 using Hospital.Application.Exceptions;
 using Hospital.Application.Interfaces;
 using MediatR;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Hospital.Application.Features.Patient.Command
 {
     public class UpdatePatientCommandHandler: IRequestHandler<UpdatePatientCommand, PatientsDto>
     {
         private readonly IUnitOfWork _unitOfWork;
-        public UpdatePatientCommandHandler(IUnitOfWork unitOfWork)
+        private readonly IFileService _fileService;
+        public UpdatePatientCommandHandler(IUnitOfWork unitOfWork, IFileService fileService)
         {
             _unitOfWork = unitOfWork;
+            _fileService = fileService;
         }
         public async Task<PatientsDto> Handle(UpdatePatientCommand command, CancellationToken cancellationToken)
         {
@@ -24,6 +27,24 @@ namespace Hospital.Application.Features.Patient.Command
             {
                 throw new NotFoundException("Patient not found");
             }
+
+
+
+            if (command.RemoveImage && !string.IsNullOrEmpty(patient.ImagePath))
+            {
+                await _fileService.DeletePatientImageAsync(patient.ImagePath);
+                patient.ImagePath = null;
+            }
+            else if (command.Image != null)
+            {
+                if (!string.IsNullOrEmpty(patient.ImagePath))
+                    await _fileService.DeletePatientImageAsync(patient.ImagePath);
+
+                patient.ImagePath = await _fileService.SavePatientImageAsync(command.Image, patient.Id);
+            }
+
+
+
             patient.ApplicationUser.FirstName = command.FirstName;
             patient.ApplicationUser.LastName = command.LastName;
             patient.ApplicationUser.Email = command.Email;
@@ -34,7 +55,8 @@ namespace Hospital.Application.Features.Patient.Command
             patient.City = command.City;
             patient.Gender = command.Gender;
             patient.DateOfBirth = command.DateOfBirth;
-           
+
+
             await _unitOfWork.SaveChangesAsync();
             return new PatientsDto
             {
@@ -45,6 +67,7 @@ namespace Hospital.Application.Features.Patient.Command
                 Phone = patient.Phone,
                 Address = patient.Address,
                 City = patient.City,
+                ImagePath = patient.ImagePath,
                 DateOfBirth = patient.DateOfBirth
             };
             

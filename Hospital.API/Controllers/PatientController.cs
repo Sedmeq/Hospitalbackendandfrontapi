@@ -1,9 +1,10 @@
-﻿using System.Threading.Tasks;
-using Hospital.Application.Features.Patient.Command;
+﻿using Hospital.Application.Features.Patient.Command;
 using Hospital.Application.Features.Patient.Queries;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
 namespace Hospital.API.Controllers
 {
@@ -40,10 +41,10 @@ namespace Hospital.API.Controllers
         }
 
         [HttpPost("CreatePatient")]
-        public async Task<IActionResult> CreatePatient([FromBody] CreatePatientCommand command)
+        public async Task<IActionResult> CreatePatient([FromForm] CreatePatientCommand command)
         {
-           var result = await _mediator.Send(command);
-            return Ok(result);  
+            var result = await _mediator.Send(command);
+            return Ok(result);
         }
 
 
@@ -55,7 +56,7 @@ namespace Hospital.API.Controllers
         }
 
         [HttpPut("UpdatePatient/{id:int}")]
-        public async Task<IActionResult> UpdatePatient(int id, [FromBody] UpdatePatientCommand command)
+        public async Task<IActionResult> UpdatePatient(int id, [FromForm] UpdatePatientCommand command)
         {
             if (command.Id != 0 && command.Id != id)
                 return BadRequest("Route id and body id do not match.");
@@ -66,9 +67,25 @@ namespace Hospital.API.Controllers
         }
 
         [HttpGet("Patient-History/{id}")]
-       public async Task<IActionResult> PatientHistory(int id)
+        public async Task<IActionResult> PatientHistory(int id)
         {
             var result = await _mediator.Send(new PatientHistoryQuery { PatientId = id });
+            return Ok(result);
+        }
+
+        [HttpGet("MyProfile")]
+        [Authorize(Roles = "Patient")]
+        public async Task<IActionResult> GetMyProfile()
+        {
+            var result = await _mediator.Send(new GetMyProfileQuery());
+            return Ok(result);
+        }
+
+        [HttpPut("UpdateMyProfile")]
+        [Authorize(Roles = "Patient")]
+        public async Task<IActionResult> UpdateMyProfile([FromForm] UpdateMyProfileCommand command)
+        {
+            var result = await _mediator.Send(command);
             return Ok(result);
         }
     }

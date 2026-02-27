@@ -26,7 +26,8 @@ namespace Hospital.Application.Features.Contact.Command
                 Email = request.Email,
                 Subject = request.Subject,
                 Phone = request.Phone,
-                Message = request.Message
+                Message = request.Message,
+                CreatedAt = DateTime.UtcNow
             };
 
             await _unitOfWork.Contacts.AddAsync(contact);
@@ -41,6 +42,7 @@ namespace Hospital.Application.Features.Contact.Command
                 Subject = contact.Subject,
                 Phone = contact.Phone,
                 Message = contact.Message,
+                CreatedAt = contact.CreatedAt
             };
         }
     }

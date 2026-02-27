@@ -34,7 +34,8 @@ namespace Hospital.Application.Features.Contact.Queries
                 Email = contact.Email,
                 Subject = contact.Subject,
                 Phone = contact.Phone,
-                Message = contact.Message
+                Message = contact.Message,
+                CreatedAt = contact.CreatedAt
             };
         }
     }

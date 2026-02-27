@@ -13,5 +13,7 @@ namespace Hospital.Application.DTOs
         public int TotalPatients { get; set; }
         public int TotalPharmacists { get; set; }
         public int TotalDepartments { get; set; }
+
+        public int TotalAppointments { get; set; }
     }
 }

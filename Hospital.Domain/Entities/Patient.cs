@@ -15,6 +15,8 @@ namespace Hospital.Domain.Entities
         public required string Phone { get; set; }
         public required string Email { get; set; }
         public required string Gender { get; set; }
+
+        public string? ImagePath { get; set; }
         public required string ApplicationUserId { get; set; }
         public ApplicationUser ApplicationUser { get; set; }
         public virtual ICollection<Prescription> Prescriptions { get; set; }

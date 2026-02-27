@@ -184,6 +184,37 @@ namespace Hospital.Infrastructure.Services
         }
 
 
+
+        public async Task<string> SavePatientImageAsync(IFormFile file, int patientId)
+        {
+            var folderPath = Path.Combine(_environment.WebRootPath, "images", "patients");
+            if (!Directory.Exists(folderPath))
+                Directory.CreateDirectory(folderPath);
+
+            var extension = Path.GetExtension(file.FileName);
+            var fileName = $"patient_{patientId}{extension}";
+            var fullPath = Path.Combine(folderPath, fileName);
+
+            using var stream = new FileStream(fullPath, FileMode.Create);
+            await file.CopyToAsync(stream);
+
+            return $"images/patients/{fileName}";
+        }
+
+        public async Task<bool> DeletePatientImageAsync(string imagePath)
+        {
+            var fullPath = Path.Combine(_environment.WebRootPath, imagePath);
+            if (File.Exists(fullPath))
+            {
+                File.Delete(fullPath);
+                return true;
+            }
+            return false;
+        }
+
+        public string GetPatientImageUrl(string imagePath) => $"/{imagePath}";
+
+
         // Ümumi metodlar (kod təkrarını azaltmaq üçün)
         private async Task<string> SaveImageAsync(IFormFile file, string folderName, string filePrefix)
         {

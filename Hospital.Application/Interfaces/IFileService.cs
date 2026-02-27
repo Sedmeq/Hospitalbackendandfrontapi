@@ -56,5 +56,11 @@ namespace Hospital.Application.Interfaces
         Task<string> SaveContactInfoImageAsync(IFormFile file, int contactInfoId);
         Task<bool> DeleteContactInfoImageAsync(string imagePath);
         string GetContactInfoImageUrl(string imagePath);
+
+
+        // Hospital.Application/Interfaces/IFileService.cs
+        Task<string> SavePatientImageAsync(IFormFile file, int patientId);
+        Task<bool> DeletePatientImageAsync(string imagePath);
+        string GetPatientImageUrl(string imagePath);
     }
 }

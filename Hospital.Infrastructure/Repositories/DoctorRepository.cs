@@ -34,7 +34,9 @@ namespace Hospital.Infrastructure.Repositories
 
         public async Task<Doctor?> GetByUserIdAsync(string userId)
         {
-            return await _context.Patient.FirstOrDefaultAsync(d => d.ApplicationUserId == userId);
+            return await _context.Patient.Include(d=>d.ApplicationUser)
+                                         .Include(d => d.Department)
+                .FirstOrDefaultAsync(d => d.ApplicationUserId == userId);
         }
 
     }

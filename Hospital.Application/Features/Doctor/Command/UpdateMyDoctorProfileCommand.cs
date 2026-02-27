@@ -7,19 +7,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hospital.Application.Features.Patient.Command
+namespace Hospital.Application.Features.Doctor.Command
 {
-    public class UpdatePatientCommand : IRequest<PatientsDto>
+    public class UpdateMyDoctorProfileCommand : IRequest<DoctorDto>
     {
-        public int Id { get; set; }
         public string FirstName { get; set; } = string.Empty;
         public string LastName { get; set; } = string.Empty;
-        public string Email { get; set; } = string.Empty;
         public string Phone { get; set; } = string.Empty;
-        public DateTime DateOfBirth { get; set; }
-        public string? Address { get; set; }
-        public string City { get; set; } = string.Empty;
-        public string Gender { get; set; } = string.Empty;
+        public string Specialty { get; set; } = string.Empty;
+        public string? Biography { get; set; }
         public IFormFile? Image { get; set; }
         public bool RemoveImage { get; set; }
     }

@@ -1,9 +1,10 @@
-﻿using System;
+﻿using MediatR;
+using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using MediatR;
 
 namespace Hospital.Application.Features.Patient.Command
 {
@@ -16,7 +17,8 @@ namespace Hospital.Application.Features.Patient.Command
         public required string Phone { get; set; }
         public DateTime DateOfBirth { get; set; }
         public string? Address { get; set; }
-        public required string City { get; set; }
+        public string City { get; set; }
+        public IFormFile? Image { get; set; }
 
         public required string Gender { get; set; }
     }

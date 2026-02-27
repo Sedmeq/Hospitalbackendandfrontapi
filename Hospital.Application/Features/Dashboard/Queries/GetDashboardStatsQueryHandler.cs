@@ -31,7 +31,9 @@ namespace Hospital.Application.Features.Dashboard.Queries
                 TotalDoctors = await _unitOfWork.Doctors.CountAsync(),
                 TotalPatients = await _unitOfWork.Patients.CountAsync(),
                 TotalPharmacists = await _unitOfWork.Pharmacists.CountAsync(),
-                TotalDepartments = await _unitOfWork.Departments.CountAsync()
+                TotalDepartments = await _unitOfWork.Departments.CountAsync(),
+
+                TotalAppointments = await _unitOfWork.Appointments.CountAsync()
             };
 
             return stats;

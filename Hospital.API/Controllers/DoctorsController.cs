@@ -41,6 +41,14 @@ namespace Hospital.API.Controllers
             return Ok(doctor);
         }
 
+        //new
+        [HttpGet("MyPatients")]
+        [Authorize(Roles = "Doctor")]
+        public async Task<IActionResult> GetMyPatients()
+        {
+            var result = await _mediator.Send(new GetMyPatientsQuery());
+            return Ok(result);
+        }
 
 
 
@@ -70,6 +78,25 @@ namespace Hospital.API.Controllers
             var deletedDoctorName = await _mediator.Send(new DeleteDoctorCommand { Id = id });
             return Ok($"Doctor '{deletedDoctorName}' was deleted successfully.");
         }
+
+
+        [HttpGet("MyProfile")]
+        [Authorize(Roles = "Doctor")]
+        public async Task<IActionResult> GetMyProfile()
+        {
+            var result = await _mediator.Send(new GetMyDoctorProfileQuery());
+            return Ok(result);
+        }
+
+        [HttpPut("UpdateMyProfile")]
+        [Authorize(Roles = "Doctor")]
+        public async Task<IActionResult> UpdateMyProfile([FromForm] UpdateMyDoctorProfileCommand command)
+        {
+            var result = await _mediator.Send(command);
+            return Ok(result);
+        }
+
+        
     }
 }
 

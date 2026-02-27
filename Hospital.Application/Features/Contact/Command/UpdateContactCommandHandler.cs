@@ -33,6 +33,7 @@ namespace Hospital.Application.Features.Contact.Command
             contact.Phone = request.Phone;
             contact.Message = request.Message;
 
+
             await _unitOfWork.Contacts.UpdateAsync(contact);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
@@ -43,7 +44,8 @@ namespace Hospital.Application.Features.Contact.Command
                 Email = contact.Email,
                 Subject = contact.Subject,
                 Phone = contact.Phone,
-                Message = contact.Message
+                Message = contact.Message,
+                CreatedAt = contact.CreatedAt
             };
         }
     }
