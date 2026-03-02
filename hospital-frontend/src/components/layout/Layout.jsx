@@ -1,65 +1,278 @@
-import React, { useState } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
-import './Layout.css';
+// import React, { useState } from 'react';
+// import { Link, useNavigate, useLocation } from 'react-router-dom';
+// import { useAuth } from '../../context/AuthContext';
+// import './Layout.css';
+
+// const Layout = ({ children }) =>
+// {
+//     const { user, logout, hasRole } = useAuth();
+//     const navigate = useNavigate();
+//     const location = useLocation();
+//     const [sidebarOpen, setSidebarOpen] = useState(true);
+
+//     const handleLogout = async () =>
+//     {
+//         await logout();
+//         navigate('/login');
+//         //window.location.href = "http://127.0.0.1:5500/index.html";
+
+//     };
+
+//     const handleGoToWebsite = () =>
+//     {
+//         window.location.href = "http://127.0.0.1:5500/index.html";
+//     };
+
+
+
+
+//     const menuItems = [
+//         { path: '/dashboard', label: 'Dashboard', icon: '📊', roles: ['Admin', 'Doctor', 'Patient'] },
+//         { path: '/doctors', label: 'Doctors', icon: '👨‍⚕️', roles: ['Admin'] },
+//         { path: '/patients', label: 'Patients', icon: '🏥', roles: ['Admin', 'Doctor'] },
+//         { path: '/appointments', label: 'Appointments', icon: '📅', roles: ['Admin', 'Doctor', 'Patient'] },
+//         { path: '/departments', label: 'Departments', icon: '🏢', roles: ['Admin'] },
+//         { path: '/nurses', label: 'Nurses', icon: '👩‍⚕️', roles: ['Admin'] },
+//         { path: '/pharmacists', label: 'Pharmacists', icon: '💊', roles: ['Admin'] },
+//         { path: '/accountants', label: 'Accountants', icon: '💰', roles: ['Admin'] },
+//         { path: '/medicine', label: 'Medicine', icon: '💉', roles: ['Admin', 'Pharmacist'] },
+//         { path: '/prescriptions', label: 'Prescriptions', icon: '📋', roles: ['Admin', 'Doctor', 'Pharmacist'] },
+//         { path: '/admin/users', label: 'User Management', icon: '👥', roles: ['Admin'] },
+//         { path: '/chat', label: 'AI Assistant', icon: '🤖', roles: ['Admin', 'Doctor', 'Patient'] },
+
+//         { path: "/blogs", label: "Blogs", icon: "📝", roles: ["Admin"] },
+
+//         { path: "/sliders", label: "Sliders", icon: "🖼️", roles: ["Admin"] },
+//         { path: "/services", label: "Services", icon: "🛠️", roles: ["Admin"] },
+//         { path: '/testimonials', label: 'Testimonials', icon: '💬', roles: ['Admin'] },
+//         { path: "/partners", label: "Partners", icon: "🤝", roles: ["Admin"] },
+//         { path: "/contacts", label: "Contacts", icon: "☎️", roles: ["Admin"] },
+//         { path: "/contact-info", label: "Contact Info", icon: "📞", roles: ["Admin"] },
+
+
+
+//         { path: '/about', label: 'About', icon: 'ℹ️', roles: ['Admin'] },
+
+
+
+
+
+//     ];
+
+//     const visibleMenuItems = menuItems.filter(item =>
+//         !item.roles || item.roles.some(role => hasRole(role))
+//     );
+
+//     return (
+//         <div className="layout">
+//             <aside className={`sidebar ${sidebarOpen ? 'open' : 'closed'}`}>
+//                 <div className="sidebar-header">
+//                     <h2>🏥 Hospital</h2>
+//                     <button
+//                         className="sidebar-toggle"
+//                         onClick={() => setSidebarOpen(!sidebarOpen)}
+//                     >
+//                         {sidebarOpen ? '◀' : '▶'}
+//                     </button>
+//                 </div>
+
+//                 <nav className="sidebar-nav">
+//                     {visibleMenuItems.map(item => (
+//                         <Link
+//                             key={item.path}
+//                             to={item.path}
+//                             className={`nav-item ${location.pathname === item.path ? 'active' : ''}`}
+//                         >
+//                             <span className="nav-icon">{item.icon}</span>
+//                             {sidebarOpen && <span className="nav-label">{item.label}</span>}
+//                         </Link>
+//                     ))}
+//                 </nav>
+//             </aside>
+
+//             <div className="main-content">
+//                 <header className="header">
+//                     <div className="header-left">
+//                         <h1 className="page-title">Hospital Management System</h1>
+//                     </div>
+//                     <div className="header-right">
+//                         <div className="user-info">
+//                             <span className="user-name">{user?.fullName}</span>
+//                             <span className="user-role">{user?.roles?.[0]}</span>
+//                         </div>
+//                         <button
+//                             className="btn btn-primary btn-sm me-2"
+//                             onClick={handleGoToWebsite}
+//                         >
+//                             Website
+//                         </button>
+//                         <button className="btn btn-secondary btn-sm" onClick={handleLogout}>
+//                             Logout
+//                         </button>
+//                     </div>
+//                 </header>
+
+//                 <main className="content">
+//                     {children}
+//                 </main>
+//             </div>
+//         </div>
+//     );
+// };
+
+// export default Layout;
+import React, { useMemo, useState } from "react";
+import { Link, useLocation } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
+import "./Layout.css";
 
 const Layout = ({ children }) =>
 {
     const { user, logout, hasRole } = useAuth();
-    const navigate = useNavigate();
     const location = useLocation();
     const [sidebarOpen, setSidebarOpen] = useState(true);
+
+    // hansı parent açıqdır
+    const [openGroups, setOpenGroups] = useState({});
+
+    const toggleGroup = (key) =>
+    {
+        setOpenGroups((prev) => ({ ...prev, [key]: !prev[key] }));
+    };
 
     const handleLogout = async () =>
     {
         await logout();
-        // Redirect to external URL after logout
-        window.location.href = 'http://127.0.0.1:5500/novena/index.html';
+        window.location.href = "/login";
     };
 
-    const menuItems = [
-        { path: '/dashboard', label: 'Dashboard', icon: '📊', roles: ['Admin', 'Doctor', 'Patient'] },
-        { path: '/doctors', label: 'Doctors', icon: '👨‍⚕️', roles: ['Admin'] },
-        { path: '/patients', label: 'Patients', icon: '🏥', roles: ['Admin', 'Doctor'] },
-        { path: '/appointments', label: 'Appointments', icon: '📅', roles: ['Admin', 'Doctor', 'Patient'] },
-        { path: '/departments', label: 'Departments', icon: '🏢', roles: ['Admin'] },
-        { path: '/nurses', label: 'Nurses', icon: '👩‍⚕️', roles: ['Admin'] },
-        { path: '/pharmacists', label: 'Pharmacists', icon: '💊', roles: ['Admin'] },
-        { path: '/accountants', label: 'Accountants', icon: '💰', roles: ['Admin'] },
-        { path: '/medicine', label: 'Medicine', icon: '💉', roles: ['Admin', 'Pharmacist'] },
-        { path: '/prescriptions', label: 'Prescriptions', icon: '📋', roles: ['Admin', 'Doctor', 'Pharmacist'] },
-        { path: '/admin/users', label: 'User Management', icon: '👥', roles: ['Admin'] },
-        { path: '/chat', label: 'AI Assistant', icon: '🤖', roles: ['Admin', 'Doctor', 'Patient'] },
-    ];
+    const handleGoToWebsite = () =>
+    {
+        window.location.href = "http://127.0.0.1:5500/index.html";
+    };
 
-    const visibleMenuItems = menuItems.filter(item =>
-        !item.roles || item.roles.some(role => hasRole(role))
+    // ✅ Tree menu
+    const menuItems = useMemo(
+        () => [
+            { path: "/dashboard", label: "Dashboard", icon: "📊", roles: ["Admin", "Doctor", "Patient"] },
+            // 👇 GROUP (Home / Website Content)
+            {
+                key: "home",
+                label: "Home",
+                icon: "🏠",
+                roles: ["Admin"],
+                children: [
+
+                    { path: "/sliders", label: "Sliders", icon: "🖼️", roles: ["Admin"] },
+                    { path: "/services", label: "Services", icon: "🛠️", roles: ["Admin"] },
+                    { path: "/testimonials", label: "Testimonials", icon: "💬", roles: ["Admin"] },
+                    { path: "/partners", label: "Partners", icon: "🤝", roles: ["Admin"] },
+
+                    { path: "/contact-info", label: "Contact Info", icon: "📞", roles: ["Admin"] },
+                    { path: "/about", label: "About", icon: "ℹ️", roles: ["Admin"] },
+                    { path: "/about-sections", label: "About Sections", icon: "📌", roles: ["Admin"] },
+                    { path: "/faqs", label: "FAQs", icon: "❓", roles: ["Admin"] },
+
+                ],
+            },
+            { path: "/appointments", label: "Appointments", icon: "📅", roles: ["Admin", "Doctor", "Patient"] },
+            { path: "/chat", label: "AI Assistant", icon: "🤖", roles: ["Admin", "Doctor", "Patient"] },
+
+
+            { path: "/blogs", label: "Blogs", icon: "📝", roles: ["Admin"] },
+            { path: "/contacts", label: "Contacts", icon: "☎️", roles: ["Admin"] },
+            { path: "/doctors", label: "Doctors", icon: "👨‍⚕️", roles: ["Admin"] },
+            { path: "/patients", label: "Patients", icon: "🏥", roles: ["Admin", "Doctor"] },
+            { path: "/departments", label: "Departments", icon: "🏢", roles: ["Admin"] },
+            // { path: "/nurses", label: "Nurses", icon: "👩‍⚕️", roles: ["Admin"] },
+            // { path: "/pharmacists", label: "Pharmacists", icon: "💊", roles: ["Admin"] },
+            //{ path: "/accountants", label: "Accountants", icon: "💰", roles: ["Admin"] },
+            //{ path: "/medicine", label: "Medicine", icon: "💉", roles: ["Admin", "Pharmacist"] },
+            // { path: "/prescriptions", label: "Prescriptions", icon: "📋", roles: ["Admin", "Doctor", "Pharmacist"] },
+            { path: "/admin/users", label: "User Management", icon: "👥", roles: ["Admin"] },
+            // { path: "/settings/change-password", label: "Settings", icon: "⚙️", roles: ["Admin", "Doctor", "Patient"] },
+            { path: "/settings", label: "Settings", icon: "⚙️", roles: ["Admin", "Doctor", "Patient"] },
+
+        ],
+        []
     );
+
+    const canSee = (item) => !item.roles || item.roles.some((r) => hasRole(r));
+
+    // Group-un içində aktiv route varsa, onu “active” say (istəsən auto-open da edə bilərik)
+    const isChildActive = (children = []) => children.some((c) => location.pathname === c.path);
 
     return (
         <div className="layout">
-            <aside className={`sidebar ${sidebarOpen ? 'open' : 'closed'}`}>
+            <aside className={`sidebar ${sidebarOpen ? "open" : "closed"}`}>
                 <div className="sidebar-header">
                     <h2>🏥 Hospital</h2>
-                    <button
-                        className="sidebar-toggle"
-                        onClick={() => setSidebarOpen(!sidebarOpen)}
-                    >
-                        {sidebarOpen ? '◀' : '▶'}
+                    <button className="sidebar-toggle" onClick={() => setSidebarOpen(!sidebarOpen)}>
+                        {sidebarOpen ? "◀" : "▶"}
                     </button>
                 </div>
 
                 <nav className="sidebar-nav">
-                    {visibleMenuItems.map(item => (
-                        <Link
-                            key={item.path}
-                            to={item.path}
-                            className={`nav-item ${location.pathname === item.path ? 'active' : ''}`}
-                        >
-                            <span className="nav-icon">{item.icon}</span>
-                            {sidebarOpen && <span className="nav-label">{item.label}</span>}
-                        </Link>
-                    ))}
+                    {menuItems
+                        .filter(canSee)
+                        .map((item) =>
+                        {
+                            // GROUP RENDER
+                            if (item.children)
+                            {
+                                const visibleChildren = item.children.filter(canSee);
+                                if (visibleChildren.length === 0) return null;
+
+                                const groupOpen = !!openGroups[item.key];
+                                const groupActive = isChildActive(visibleChildren);
+
+                                return (
+                                    <div key={item.key} className={`nav-group ${groupActive ? "active" : ""}`}>
+                                        <button
+                                            type="button"
+                                            className={`nav-item nav-group-btn ${groupOpen ? "open" : ""}`}
+                                            onClick={() => toggleGroup(item.key)}
+                                        >
+                                            <span className="nav-icon">{item.icon}</span>
+                                            {sidebarOpen && (
+                                                <>
+                                                    <span className="nav-label">{item.label}</span>
+                                                    <span className="nav-caret">{groupOpen ? "▾" : "▸"}</span>
+                                                </>
+                                            )}
+                                        </button>
+
+                                        {groupOpen && sidebarOpen && (
+                                            <ul className="submenu">
+                                                {visibleChildren.map((child) => (
+                                                    <li key={child.path}>
+                                                        <Link
+                                                            to={child.path}
+                                                            className={`submenu-item ${location.pathname === child.path ? "active" : ""}`}
+                                                        >
+                                                            <span className="nav-icon">{child.icon}</span>
+                                                            <span className="nav-label">{child.label}</span>
+                                                        </Link>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        )}
+                                    </div>
+                                );
+                            }
+
+                            // NORMAL LINK
+                            return (
+                                <Link
+                                    key={item.path}
+                                    to={item.path}
+                                    className={`nav-item ${location.pathname === item.path ? "active" : ""}`}
+                                >
+                                    <span className="nav-icon">{item.icon}</span>
+                                    {sidebarOpen && <span className="nav-label">{item.label}</span>}
+                                </Link>
+                            );
+                        })}
                 </nav>
             </aside>
 
@@ -73,15 +286,16 @@ const Layout = ({ children }) =>
                             <span className="user-name">{user?.fullName}</span>
                             <span className="user-role">{user?.roles?.[0]}</span>
                         </div>
+                        <button className="btn btn-primary btn-sm me-2" onClick={handleGoToWebsite}>
+                            Website
+                        </button>
                         <button className="btn btn-secondary btn-sm" onClick={handleLogout}>
                             Logout
                         </button>
                     </div>
                 </header>
 
-                <main className="content">
-                    {children}
-                </main>
+                <main className="content">{children}</main>
             </div>
         </div>
     );

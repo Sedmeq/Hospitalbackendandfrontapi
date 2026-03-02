@@ -17,6 +17,10 @@ namespace Hospital.Application.Features.Appointment.Command
         public string PatientName { get; set; } = string.Empty; // YENİ
         public string PatientPhone { get; set; } = string.Empty; // YENİ
         public string Message { get; set; } = string.Empty; // YENİ
+
+        //new
+        public bool IsVideoCall { get; set; } = false;
+
         public int? PatientId { get; set; }
     }
 }

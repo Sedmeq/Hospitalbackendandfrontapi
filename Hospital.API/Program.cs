@@ -1,5 +1,6 @@
 using FluentValidation;
 using Hangfire;
+using Hospital.API.Hubs;
 using Hospital.API.Middleware;
 using Hospital.Application.Common.Behaviors;
 using Hospital.Application.Common.Setting;
@@ -45,6 +46,9 @@ namespace Hospital.API
                 // --- Add services to the container ---
                 builder.Services.AddControllers();
 
+                //new
+                builder.Services.AddSignalR();
+
                 builder.Services.AddCors(options =>
                 {
                     options.AddPolicy("ReactCors", policy =>
@@ -54,7 +58,8 @@ namespace Hospital.API
                             "http://127.0.0.1:5500",
                             "http://localhost:3000")
                             .AllowAnyHeader()
-                            .AllowAnyMethod();
+                            .AllowAnyMethod()
+                            .AllowCredentials(); ;
                     });
                 });
 
@@ -178,6 +183,25 @@ namespace Hospital.API
                         IssuerSigningKey = new SymmetricSecurityKey(
                             Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
                     };
+
+
+                    //new changes
+                    options.Events = new JwtBearerEvents
+                    {
+                        OnMessageReceived = context =>
+                        {
+                            var accessToken = context.Request.Query["access_token"];
+                            var path = context.HttpContext.Request.Path;
+
+                            if (!string.IsNullOrEmpty(accessToken) &&
+                                path.StartsWithSegments("/hubs/videocall"))
+                            {
+                                context.Token = accessToken;
+                            }
+
+                            return Task.CompletedTask;
+                        }
+                    };
                 })
 
                 .AddGoogle(options =>                        
@@ -262,6 +286,8 @@ namespace Hospital.API
                 app.UseAuthentication();
                 app.UseMiddleware<TokenBlacklistMiddleware>();
                 app.UseAuthorization();
+                app.MapHub<VideoCallHub>("/hubs/videocall");
+
 
                 app.MapControllers();
 

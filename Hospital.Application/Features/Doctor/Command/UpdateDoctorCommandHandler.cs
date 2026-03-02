@@ -31,8 +31,10 @@ namespace Hospital.Application.Features.Doctor.Command
 
             doctor.ApplicationUser.FirstName = request.FirstName;
             doctor.ApplicationUser.LastName = request.LastName;
-            doctor.ApplicationUser.PhoneNumber = request.Phone;
-           // doctor.ApplicationUser.Email = request.Email;
+            //doctor.ApplicationUser.PhoneNumber = request.Phone;
+            doctor.Phone = request.Phone;
+
+            // doctor.ApplicationUser.Email = request.Email;
             doctor.Specialty = request.Specialty;
             doctor.DepartmentId = request.DepartmentId;
             doctor.Biography = request.Biography;
@@ -64,7 +66,7 @@ namespace Hospital.Application.Features.Doctor.Command
                 Id = doctor.Id,
                 FullName = $"{doctor.ApplicationUser.FirstName} {doctor.ApplicationUser.LastName}",
                 Email = doctor.ApplicationUser.Email,
-                Phone = doctor.ApplicationUser.PhoneNumber,
+                Phone = doctor.Phone,
                 Specialty = doctor.Specialty,
                 DepartmentId = doctor.DepartmentId,
                 ImagePath = doctor.ImagePath

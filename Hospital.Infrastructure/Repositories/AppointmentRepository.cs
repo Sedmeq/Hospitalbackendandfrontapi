@@ -72,8 +72,34 @@ namespace Hospital.Infrastructure.Repositories
                 .Include(a => a.Department) // YENİ
                 .ToListAsync();
         }
+
+
+
+        //new
+        public async Task<List<string>> GetBookedTimesAsync(int doctorId, DateTime date)
+        {
+            var dayStart = date.Date;
+            var dayEnd = dayStart.AddDays(1);
+
+            return await _context.Appointments
+                .Where(a => a.DoctorId == doctorId
+                         && a.Date >= dayStart
+                         && a.Date < dayEnd
+                         && a.Status != "Cancelled")
+                .Select(a => a.Time)
+                .ToListAsync();
+        }
+
+        public async Task<bool> IsSlotTakenAsync(int doctorId, DateTime date, string time)
+        {
+            return await _context.Appointments.AnyAsync(a =>
+                a.DoctorId == doctorId &&
+                a.Date.Date == date.Date &&
+                a.Time == time &&
+                a.Status != "Cancelled");
+        }
+
+
     }
-
-
 }
 

@@ -1,6 +1,7 @@
 ﻿using Hospital.Application.Features.Blog.Command;
 using Hospital.Application.Features.Blog.Queries;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hospital.API.Controllers
@@ -73,6 +74,7 @@ namespace Hospital.API.Controllers
         }
 
         [HttpPost("AddComment")]
+        [Authorize]
         public async Task<IActionResult> AddComment([FromBody] AddCommentToBlogCommand command)
         {
             var comment = await _mediator.Send(command);

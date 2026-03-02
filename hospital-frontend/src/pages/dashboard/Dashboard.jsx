@@ -4,31 +4,54 @@ import { useAuth } from '../../context/AuthContext';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import './Dashboard.css';
 
-const Dashboard = () => {
+const Dashboard = () =>
+{
     const { user, hasRole } = useAuth();
     const [stats, setStats] = useState(null);
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        if (hasRole('Admin')) {
+    // useEffect(() =>
+    // {
+    //     if (hasRole('Admin'))
+    //     {
+    //         loadDashboardStats();
+    //     } else
+    //     {
+    //         setLoading(false);
+    //     }
+    // }, []);
+    useEffect(() =>
+    {
+        // user hələ yüklənməyibsə, çıx (spinner qalsın)
+        if (!user) return;
+
+        if (hasRole('Admin'))
+        {
             loadDashboardStats();
-        } else {
+        } else
+        {
             setLoading(false);
         }
-    }, []);
-
-    const loadDashboardStats = async () => {
-        try {
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [user]);
+    
+    const loadDashboardStats = async () =>
+    {
+        try
+        {
             const response = await adminApi.getDashboardStats();
             setStats(response.data);
-        } catch (error) {
+        } catch (error)
+        {
             console.error('Error loading dashboard stats:', error);
-        } finally {
+        } finally
+        {
             setLoading(false);
         }
     };
 
-    if (loading) {
+    if (loading)
+    {
         return <LoadingSpinner fullScreen />;
     }
 
@@ -142,8 +165,8 @@ const Dashboard = () => {
                             <span className="badge badge-primary">{user?.roles?.[0]}</span>
                         </div>
                         <div className="info-item">
-                            <span className="info-label">Email:</span>
-                            <span>{user?.email}</span>
+                            <span className="info-label">Username:</span>
+                            <span>{user?.fullName}</span>
                         </div>
                         <div className="info-item">
                             <span className="info-label">Status:</span>

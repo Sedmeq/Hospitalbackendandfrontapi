@@ -16,7 +16,7 @@ namespace Hospital.Application.Features.Blog.Command
         public string Content { get; set; } = string.Empty;
         public string Author { get; set; } = string.Empty;
         public string Category { get; set; } = string.Empty;
-        public IFormFile? Image { get; set; }
+        public IFormFile? ImagePath { get; set; }
         public bool RemoveImage { get; set; }
     }
 }

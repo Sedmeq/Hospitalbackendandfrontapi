@@ -98,11 +98,18 @@ namespace Hospital.Application.Features.Appointment.Command
 
             // *** YENİ: 8. Bu vaxt artıq məşğuldur? ***
             var existingAppointments = await _unitOfWork.Appointments.GetAllAsync();
-            var isTimeSlotTaken = existingAppointments.Any(a =>
-                a.DoctorId == request.DoctorId &&
-                a.Date.Date == request.Date.Date &&
-                a.Time == request.Time &&
-                a.Status != "Cancelled");
+            //var isTimeSlotTaken = existingAppointments.Any(a =>
+            //    a.DoctorId == request.DoctorId &&
+            //    a.Date.Date == request.Date.Date &&
+            //    a.Time == request.Time &&
+            //    a.Status != "Cancelled");
+            var isTimeSlotTaken = await _unitOfWork.Appointments
+    .IsSlotTakenAsync(request.DoctorId, request.Date.Date, request.Time);
+
+            if (isTimeSlotTaken)
+            {
+                throw new BadRequestException("This time slot is already booked. Please choose another time.");
+            }
 
             if (isTimeSlotTaken)
             {
@@ -137,13 +144,14 @@ namespace Hospital.Application.Features.Appointment.Command
             // Appointment yarat
             var newAppointment = new Domain.Entities.Appointment
             {
-                Date = request.Date,
+                Date = request.Date.Date,
                 Time = request.Time,
                 Status = "Pending",
                 PatientName = request.PatientName,
                 PatientPhone = request.PatientPhone,
                 Message = request.Message,
                 DoctorId = request.DoctorId,
+                IsVideoCall = request.IsVideoCall,
                 //PatientId = request.PatientId,
                 PatientId = patient.Id,
 
@@ -171,7 +179,9 @@ namespace Hospital.Application.Features.Appointment.Command
                 RegisteredPatientName = $"{patient.ApplicationUser.FirstName} {patient.ApplicationUser.LastName}",
 
                 DepartmentId = department.Id,
-                DepartmentName = department.Name
+                DepartmentName = department.Name,
+                //new
+                IsVideoCall = newAppointment.IsVideoCall
             };
         }
     }

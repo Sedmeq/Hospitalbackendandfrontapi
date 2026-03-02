@@ -18,6 +18,9 @@ namespace Hospital.Domain.Entities
         public string PatientPhone { get; set; } = string.Empty; // YENİ
         public string Message { get; set; } = string.Empty;
 
+        //new
+        public bool IsVideoCall { get; set; } = false;
+
 
         public int DoctorId { get; set; }
         public virtual Doctor doctor { get; set; }

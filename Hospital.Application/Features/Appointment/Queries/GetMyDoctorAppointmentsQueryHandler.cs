@@ -55,7 +55,8 @@ namespace Hospital.Application.Features.Appointment.Queries
                     ? $"{x.patient.ApplicationUser?.FirstName} {x.patient.ApplicationUser?.LastName}"
                     : null,
                 DepartmentId = x.DepartmentId,
-                DepartmentName = x.Department?.Name ?? string.Empty
+                DepartmentName = x.Department?.Name ?? string.Empty,
+                    IsVideoCall = x.IsVideoCall
             });
         }
     }

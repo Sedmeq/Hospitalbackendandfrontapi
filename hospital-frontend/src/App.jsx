@@ -5,8 +5,8 @@ import ProtectedRoute from './components/common/ProtectedRoute';
 import Layout from './components/layout/Layout';
 
 // Auth Pages
-// import Login from './pages/auth/Login';
-// import Register from './pages/auth/Register';
+import Login from './pages/auth/Login';
+import Register from './pages/auth/Register';
 
 // Dashboard
 import Dashboard from './pages/dashboard/Dashboard';
@@ -20,9 +20,63 @@ import NursesList from './pages/nurses/NursesList';
 import PharmacistsList from './pages/pharmacists/PharmacistsList';
 import AccountantsList from './pages/accountants/AccountantsList';
 import MedicineList from './pages/medicine/MedicineList';
-import PrescriptionsList from './pages/prescriptions/PrescriptionsList';
+// import PrescriptionsList from './pages/prescriptions/PrescriptionsList';
 import UserManagement from './pages/admin/UserManagement';
 import ChatInterface from './pages/chat/ChatInterface';
+
+import SliderList from "./pages/slider/SliderList";
+import ServiceList from "./pages/service/ServiceList";
+import TestimonialList from "./pages/testimonial/TestimonialList";
+import AboutList from './pages/about/AboutList';
+import PartnersList from "./pages/partners/PartnersList";
+import BlogList from "./pages/blog/BlogList";
+import BlogDetails from "./pages/blog/BlogDetails";
+
+import DoctorDetails from "./pages/doctors/DoctorDetails";
+import ContactPage from "./pages/contact/ContactList";
+import ContactInfoList from "./pages/contactInfo/ContactInfoList";
+import AboutSectionList from "./pages/AboutSection/AboutSectionList";
+//import ChangePassword from "./pages/settings/ChangePassword";
+import ForgotPassword from "./pages/auth/ForgotPassword";
+import ResetPassword from "./pages/auth/ResetPassword";
+import FaqList from "./pages/faq/FaqList";
+import Settings from "./pages/settings/Settings";
+
+
+function HashTokenBridge()
+{
+    const location = useLocation();
+    const navigate = useNavigate();
+
+    useEffect(() =>
+    {
+        const hash = location.hash;
+        if (!hash || !hash.includes("token=")) return;
+
+        const params = new URLSearchParams(hash.slice(1));
+        const token = params.get("token");
+        const name = params.get("name") || "";
+        const roles = params.get("roles") || "[]";
+
+        if (token)
+        {
+            localStorage.setItem("authToken", token);
+            localStorage.setItem("userName", decodeURIComponent(name));
+            localStorage.setItem("userRoles", decodeURIComponent(roles));
+
+            // hash silinsin
+            window.history.replaceState({}, document.title, location.pathname + location.search);
+
+            // /dashboard-da qal
+            if (location.pathname !== "/dashboard")
+            {
+                navigate("/dashboard", { replace: true });
+            }
+        }
+    }, [location.hash]);
+
+    return null;
+}
 
 import './styles/index.css';
 
@@ -33,16 +87,87 @@ function App()
             <BrowserRouter>
                 <Routes>
                     {/* Public Routes */}
-                    {/* <Route path="/login" element={<Login />} />
-                    <Route path="/register" element={<Register />} /> */}
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/register" element={<Register />} />
+
+                    <Route path="/forgot-password" element={<ForgotPassword />} />
+                    <Route path="/reset-password" element={<ResetPassword />} />
+
+
+                    <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
                     {/* Protected Routes */}
-                    <Route
+                    {/* <Route
                         path="/"
                         element={
                             <ProtectedRoute>
                                 <Layout>
                                     <Navigate to="/dashboard" replace />
+                                </Layout>
+                            </ProtectedRoute>
+                        }
+                    /> */}
+
+                    <Route path="/doctor-details/:id" element={<DoctorDetails />} />
+
+                    <Route
+                        path="/contacts"
+                        element={
+                            <ProtectedRoute requiredRole="Admin">
+                                <Layout>
+                                    <ContactPage />
+                                </Layout>
+                            </ProtectedRoute>
+                        }
+                    />
+
+                    <Route
+                        path="/settings"
+                        element={
+                            <ProtectedRoute roles={["Admin", "Doctor", "Patient"]}>
+                                <Layout>
+                                    <Settings />
+                                </Layout>
+                            </ProtectedRoute>
+                        }
+                    />
+
+                    {/* <Route
+                        path="/settings/change-password"
+                        element={
+                            <ProtectedRoute>
+                                <Layout>
+                                    <ChangePassword />
+                                </Layout>
+                            </ProtectedRoute>
+                        }
+                    /> */}
+
+
+                    <Route path="/faqs" element={
+                        <ProtectedRoute requiredRole="Admin">
+                            <Layout>
+                                <FaqList />
+                            </Layout>
+                        </ProtectedRoute>} />
+
+                    <Route
+                        path="/about-sections"
+                        element={
+                            <ProtectedRoute requiredRole="Admin">
+                                <Layout>
+                                    <AboutSectionList />
+                                </Layout>
+                            </ProtectedRoute>
+                        }
+                    />
+
+                    <Route
+                        path="/contact-info"
+                        element={
+                            <ProtectedRoute requiredRole="Admin">
+                                <Layout>
+                                    <ContactInfoList />
                                 </Layout>
                             </ProtectedRoute>
                         }
@@ -54,6 +179,82 @@ function App()
                             <ProtectedRoute>
                                 <Layout>
                                     <Dashboard />
+                                </Layout>
+                            </ProtectedRoute>
+                        }
+                    />
+
+                    <Route
+                        path="/about"
+                        element={
+                            <ProtectedRoute requiredRole="Admin">
+                                <Layout>
+                                    <AboutList />
+                                </Layout>
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/partners"
+                        element={
+                            <ProtectedRoute requiredRole="Admin">
+                                <Layout>
+                                    <PartnersList />
+                                </Layout>
+                            </ProtectedRoute>
+                        }
+                    />
+
+                    <Route
+                        path="/blogs"
+                        element={
+                            <ProtectedRoute requiredRole="Admin">
+                                <Layout>
+                                    <BlogList />
+                                </Layout>
+                            </ProtectedRoute>
+                        }
+                    />
+
+                    <Route
+                        path="/blogs/:id"
+                        element={
+                            <ProtectedRoute requiredRole="Admin">
+                                <Layout>
+                                    <BlogDetails />
+                                </Layout>
+                            </ProtectedRoute>
+                        }
+                    />
+
+                    <Route
+                        path="/sliders"
+                        element={
+                            <ProtectedRoute requiredRole="Admin">
+                                <Layout>
+                                    <SliderList />
+                                </Layout>
+                            </ProtectedRoute>
+                        }
+                    />
+
+                    <Route
+                        path="/services"
+                        element={
+                            <ProtectedRoute requiredRole="Admin">
+                                <Layout>
+                                    <ServiceList />
+                                </Layout>
+                            </ProtectedRoute>
+                        }
+                    />
+
+                    <Route
+                        path="/testimonials"
+                        element={
+                            <ProtectedRoute requiredRole="Admin">
+                                <Layout>
+                                    <TestimonialList />
                                 </Layout>
                             </ProtectedRoute>
                         }
@@ -147,7 +348,7 @@ function App()
                         }
                     />
 
-                    <Route
+                    {/* <Route
                         path="/prescriptions"
                         element={
                             <ProtectedRoute>
@@ -156,7 +357,7 @@ function App()
                                 </Layout>
                             </ProtectedRoute>
                         }
-                    />
+                    /> */}
 
                     <Route
                         path="/admin/users"

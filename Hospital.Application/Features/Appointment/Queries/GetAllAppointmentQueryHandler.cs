@@ -38,7 +38,8 @@ namespace Hospital.Application.Features.Appointment.Queries
                 Date = x.Date,
                 Status = x.Status,
                 DoctorId = x.DoctorId,
-                PatientId = x.PatientId
+                PatientId = x.PatientId,
+                IsVideoCall = x.IsVideoCall
             });
 
         }

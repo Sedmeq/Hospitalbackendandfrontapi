@@ -14,5 +14,8 @@ namespace Hospital.Application.Interfaces
         Task<IEnumerable<Appointment>> GetPatientAppointmentsById(int id);
 
 
+        //new
+        Task<List<string>> GetBookedTimesAsync(int doctorId, DateTime date);
+        Task<bool> IsSlotTakenAsync(int doctorId, DateTime date, string time);
     }
 }

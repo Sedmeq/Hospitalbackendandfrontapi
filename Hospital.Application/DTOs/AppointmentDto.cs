@@ -17,6 +17,10 @@ namespace Hospital.Application.DTOs
         public string PatientPhone { get; set; } = string.Empty; // YENİ
         public string Message { get; set; } = string.Empty; // YENİ
 
+        //new
+        public bool IsVideoCall { get; set; }
+
+
         public int DoctorId { get; set; }
         public string DoctorName { get; set; } = string.Empty;
 

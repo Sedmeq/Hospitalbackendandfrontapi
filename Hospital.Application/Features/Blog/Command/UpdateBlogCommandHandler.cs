@@ -40,14 +40,14 @@ namespace Hospital.Application.Features.Blog.Command
                 await _fileService.DeleteBlogImageAsync(blog.ImagePath);
                 blog.ImagePath = string.Empty;
             }
-            else if (request.Image != null)
+            else if (request.ImagePath != null)
             {
                 if (!string.IsNullOrEmpty(blog.ImagePath))
                 {
                     await _fileService.DeleteBlogImageAsync(blog.ImagePath);
                 }
 
-                blog.ImagePath = await _fileService.SaveBlogImageAsync(request.Image, blog.Id);
+                blog.ImagePath = await _fileService.SaveBlogImageAsync(request.ImagePath, blog.Id);
             }
 
             await _unitOfWork.Blogs.UpdateAsync(blog);

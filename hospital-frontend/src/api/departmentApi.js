@@ -1,19 +1,41 @@
+// import axiosInstance from './axiosConfig';
+
+// export const departmentApi = {
+//     getAllDepartments: () => axiosInstance.get('/department/GetAllDepartments'),
+
+//     getDepartmentById: (id) => axiosInstance.get(`/department/GetDepatmentByID/${id}`),
+
+//     createDepartment: (departmentData) =>
+//         axiosInstance.post('/department/CreateDepartment', departmentData),
+
+//     updateDepartment: (id, departmentData) =>
+//         axiosInstance.put(`/department/UpdateDepartment/${id}`, departmentData),
+
+//     deleteDepartment: (id) =>
+//         axiosInstance.delete(`/department/DeleteDepartment/${id}`),
+
+//     getDoctorsInDepartment: (departmentId) =>
+//         axiosInstance.get(`/department/GetAllDoctorsInSpecificDepartment/${departmentId}`),
+// };
 import axiosInstance from './axiosConfig';
 
 export const departmentApi = {
-    getAllDepartments: () => axiosInstance.get('/department/GetAllDepartments'),
+  getAllDepartments: () => axiosInstance.get('/department/GetAllDepartments'),
 
-    getDepartmentById: (id) => axiosInstance.get(`/department/GetDepatmentByID/${id}`),
+  getDepartmentById: (id) => axiosInstance.get(`/department/GetDepatmentByID/${id}`),
 
-    createDepartment: (departmentData) =>
-        axiosInstance.post('/department/CreateDepartment', departmentData),
+  createDepartment: (formData) =>
+    axiosInstance.post('/department/CreateDepartment', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    }),
 
-    updateDepartment: (id, departmentData) =>
-        axiosInstance.put(`/department/UpdateDepartment/${id}`, departmentData),
+  updateDepartment: (id, formData) =>
+    axiosInstance.put(`/department/UpdateDepartment/${id}`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    }),
 
-    deleteDepartment: (id) =>
-        axiosInstance.delete(`/department/DeleteDepartment/${id}`),
+  deleteDepartment: (id) => axiosInstance.delete(`/department/DeleteDepartment/${id}`),
 
-    getDoctorsInDepartment: (departmentId) =>
-        axiosInstance.get(`/department/GetAllDoctorsInSpecificDepartment/${departmentId}`),
+  getDoctorsInDepartment: (departmentId) =>
+    axiosInstance.get(`/department/GetAllDoctorsInSpecificDepartment/${departmentId}`),
 };
