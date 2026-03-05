@@ -427,7 +427,15 @@ const UserManagement = () =>
             showToast('Role assigned successfully', 'success');
         } catch (e)
         {
-            showToast('Error assigning role', 'error');
+            // Backend-dən gələn real error mesajını göstər (məs: yaş yoxlanışı uğursuzluğu)
+            // Middleware: BadRequestException → { error: "..." }
+            const apiMessage =
+                e?.response?.data?.error ||     // { error: "..." } formatı  ← BadRequestException
+                e?.response?.data?.message ||   // { message: "..." } formatı
+                e?.response?.data ||            // plain string formatı
+                e?.message ||
+                'Error assigning role';
+            showToast(typeof apiMessage === 'string' ? apiMessage : 'Error assigning role', 'error');
         }
     };
 

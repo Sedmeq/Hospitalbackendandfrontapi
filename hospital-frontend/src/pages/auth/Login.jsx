@@ -187,167 +187,329 @@
 
 
 
+// import React, { useEffect, useRef, useState } from 'react';
+// import { useNavigate, Link, useSearchParams } from 'react-router-dom';
+// // import React, { useEffect, useState } from 'react';
+// // import { useNavigate, Link, useSearchParams } from 'react-router-dom';
+// import { useAuth } from '../../context/AuthContext';
+// import { useToast } from '../../components/common/Toast';
+// import './Auth.css';
+
+// import { GoogleLogin } from "@react-oauth/google";
+// import { authApi } from "../../api/authApi";
+
+// const Login = () =>
+// {
+//     const navigate = useNavigate();
+//     const { login } = useAuth();
+//     const { showToast, ToastComponent } = useToast();
+
+//     const [searchParams] = useSearchParams();
+
+//     const [formData, setFormData] = useState({
+//         email: '',
+//         password: '',
+//     });
+//     const [loading, setLoading] = useState(false);
+
+//     // useEffect(() =>
+//     // {
+//     //     const verified = searchParams.get("verified");
+
+//     //     if (verified === "true")
+//     //     {
+//     //         showToast("✅ Email təsdiqləndi. İndi daxil ola bilərsən.", "success");
+//     //         // istəsən query-ni təmizlə:
+//     //         window.history.replaceState({}, document.title, "/login");
+//     //     }
+//     //     else if (verified === "false")
+//     //     {
+//     //         showToast("❌ Email təsdiqlənmədi və ya linkin vaxtı bitib.", "error");
+//     //         window.history.replaceState({}, document.title, "/login");
+//     //     }
+//     // }, [searchParams, showToast]);
+
+//     //const [searchParams] = useSearchParams();
+//     const verified = searchParams.get("verified");
+//     const shownRef = useRef(false);
+
+//     useEffect(() =>
+//     {
+//         // artıq göstərilibsə, bir də göstərmə
+//         if (shownRef.current) return;
+
+//         if (verified === "true")
+//         {
+//             shownRef.current = true;
+//             showToast("✅ Email təsdiqləndi. İndi daxil ola bilərsən.", "success");
+
+//             // query-ni təmizlə ki refresh-də təkrar olmasın
+//             window.history.replaceState({}, document.title, "/login");
+//         }
+//         else if (verified === "false")
+//         {
+//             shownRef.current = true;
+//             showToast("❌ Email təsdiqlənmədi və ya linkin vaxtı bitib.", "error");
+//             window.history.replaceState({}, document.title, "/login");
+//         }
+//     }, [verified]); // ⚠️ burda showToast YOXdur!
+
+//     const handleChange = (e) =>
+//     {
+//         setFormData({
+//             ...formData,
+//             [e.target.name]: e.target.value,
+//         });
+//     };
+
+//     //google
+//     const handleGoogleSuccess = async (credentialResponse) =>
+//     {
+//         console.log("GOOGLE SUCCESS", credentialResponse);
+//         try
+//         {
+//             const idToken = credentialResponse?.credential; // ✅ IdToken burada gəlir
+//             if (!idToken)
+//             {
+//                 showToast("Google token alınmadı.", "error");
+//                 return;
+//             }
+
+//             const res = await authApi.googleSignIn(idToken);
+
+//             // backend LoginResponce qaytarır: token/fullName/roles/email
+//             const result = res.data;
+
+//             if (!result?.token)
+//             {
+//                 showToast("Google login alınmadı.", "error");
+//                 return;
+//             }
+
+//             const token = result.token;
+//             const fullName = result.fullName || "";
+//             const roles = JSON.stringify(result.roles || []);
+
+//             // Səndəki flow: index.html-ə token ötürürsən
+//             // const url =
+//             //     "http://127.0.0.1:5500/index.html" +
+//             //     `#token=${encodeURIComponent(token)}` +
+//             //     `&name=${encodeURIComponent(fullName)}` +
+//             //     `&roles=${encodeURIComponent(roles)}`;
+
+//             // window.location.href = url;
+
+
+
+
+//             //islemese bunu acc
+
+//             //asagidaki
+
+
+
+
+
+
+
+
+
+
+
+//             // const returnUrl = searchParams.get("returnUrl") || "http://127.0.0.1:5500/index.html";
+//             // const url =
+//             //     returnUrl +
+//             //     `#token=${encodeURIComponent(token)}` +
+//             //     `&name=${encodeURIComponent(fullName)}` +
+//             //     `&roles=${encodeURIComponent(roles)}`;
+//             // window.location.href = url;
+
+//             const returnUrl = searchParams.get("returnUrl") || "http://localhost:5173/dashboard";
+//             const url =
+//                 returnUrl +
+//                 `#token=${encodeURIComponent(token)}` +
+//                 `&name=${encodeURIComponent(fullName)}` +
+//                 `&roles=${encodeURIComponent(roles)}`;
+
+//             window.location.href = url;
+//         } catch (err)
+//         {
+//             const msg =
+//                 err?.response?.data?.message ||
+//                 err?.response?.data ||
+//                 err?.message ||
+//                 "Google login zamanı xəta baş verdi";
+//             showToast(msg, "error");
+//         }
+//     };
+
+//     const handleGoogleError = () =>
+//     {
+//         showToast("Google login alınmadı.", "error");
+//     };
+
+//     const handleSubmit = async (e) =>
+//     {
+//         e.preventDefault();
+//         setLoading(true);
+
+//         try
+//         {
+//             const result = await login(formData);
+
+//             if (!result?.success)
+//             {
+//                 showToast(result?.message || "Email və ya şifrə yanlışdır", "error");
+//                 return;
+//             }
+
+//             const token = result.token;
+//             const fullName = result.fullName || "";
+//             const roles = JSON.stringify(result.roles || []);
+
+//             const url =
+//                 "http://127.0.0.1:5500/index.html" +
+//                 `#token=${encodeURIComponent(token)}` +
+//                 `&name=${encodeURIComponent(fullName)}` +
+//                 `&roles=${encodeURIComponent(roles)}`;
+
+//             window.location.href = url;
+//         }
+//         catch (err)
+//         {
+//             const msg =
+//                 err?.response?.data?.message ||
+//                 err?.response?.data ||
+//                 err?.message ||
+//                 "Login zamanı xəta baş verdi";
+
+//             showToast(msg, "error");
+//         }
+//         finally
+//         {
+//             setLoading(false);
+//         }
+//     };
+
+//     return (
+//         <div className="auth-container">
+//             {ToastComponent}
+//             <div className="auth-card card-glass">
+//                 <div className="auth-header">
+//                     <h1>🏥 Hospital Management</h1>
+//                     <h2>Welcome Back</h2>
+//                     <p>Sign in to your account</p>
+//                 </div>
+
+//                 <form onSubmit={handleSubmit} className="auth-form">
+//                     <div className="form-group">
+//                         <label className="form-label">Email</label>
+//                         <input
+//                             type="email"
+//                             name="email"
+//                             className="form-input"
+//                             value={formData.email}
+//                             onChange={handleChange}
+//                             required
+//                             placeholder="Enter your email"
+//                         />
+//                     </div>
+
+//                     <div className="form-group">
+//                         <label className="form-label">Password</label>
+//                         <input
+//                             type="password"
+//                             name="password"
+//                             className="form-input"
+//                             value={formData.password}
+//                             onChange={handleChange}
+//                             required
+//                             placeholder="Enter your password"
+//                         />
+//                     </div>
+
+//                     <button
+//                         type="submit"
+//                         className="btn btn-primary btn-lg"
+//                         disabled={loading}
+//                         style={{ width: '100%' }}
+//                     >
+//                         {loading ? 'Signing in...' : 'Sign In'}
+//                     </button>
+//                 </form>
+
+//                 <div style={{ marginTop: 12 }}>
+//                     <div style={{ display: "flex", justifyContent: "center" }}>
+//                         <GoogleLogin onSuccess={handleGoogleSuccess} onError={handleGoogleError} />
+//                     </div>
+//                 </div>
+
+//                 <div className="auth-footer">
+//                     <p>
+//                         Don't have an account? <Link to="/register">Create one</Link>
+//                     </p>
+
+//                     <p style={{ marginTop: 8 }}>
+//                         <Link to="/forgot-password">Forgot password?</Link>
+//                     </p>
+//                 </div>
+//             </div>
+//         </div>
+//     );
+// };
+
+// export default Login;
+
+
+
+
+
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, Link, useSearchParams } from 'react-router-dom';
-// import React, { useEffect, useState } from 'react';
-// import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../components/common/Toast';
 import './Auth.css';
 
-import { GoogleLogin } from "@react-oauth/google";
-import { authApi } from "../../api/authApi";
+import { GoogleLogin } from '@react-oauth/google';
+import { authApi } from '../../api/authApi';
 
 const Login = () =>
 {
     const navigate = useNavigate();
-    const { login } = useAuth();
+    const { login, loginWithGoogle } = useAuth();
     const { showToast, ToastComponent } = useToast();
 
     const [searchParams] = useSearchParams();
-
-    const [formData, setFormData] = useState({
-        email: '',
-        password: '',
-    });
+    const [formData, setFormData] = useState({ email: '', password: '' });
     const [loading, setLoading] = useState(false);
 
-    // useEffect(() =>
-    // {
-    //     const verified = searchParams.get("verified");
-
-    //     if (verified === "true")
-    //     {
-    //         showToast("✅ Email təsdiqləndi. İndi daxil ola bilərsən.", "success");
-    //         // istəsən query-ni təmizlə:
-    //         window.history.replaceState({}, document.title, "/login");
-    //     }
-    //     else if (verified === "false")
-    //     {
-    //         showToast("❌ Email təsdiqlənmədi və ya linkin vaxtı bitib.", "error");
-    //         window.history.replaceState({}, document.title, "/login");
-    //     }
-    // }, [searchParams, showToast]);
-
-    //const [searchParams] = useSearchParams();
-    const verified = searchParams.get("verified");
+    // ── Email təsdiq toast (bir dəfə göstər) ───────────────────────────────
+    const verified = searchParams.get('verified');
     const shownRef = useRef(false);
 
     useEffect(() =>
     {
-        // artıq göstərilibsə, bir də göstərmə
         if (shownRef.current) return;
-
-        if (verified === "true")
+        if (verified === 'true')
         {
             shownRef.current = true;
-            showToast("✅ Email təsdiqləndi. İndi daxil ola bilərsən.", "success");
-
-            // query-ni təmizlə ki refresh-də təkrar olmasın
-            window.history.replaceState({}, document.title, "/login");
+            showToast('✅ Email təsdiqləndi. İndi daxil ola bilərsən.', 'success');
+            window.history.replaceState({}, document.title, '/login');
         }
-        else if (verified === "false")
+        else if (verified === 'false')
         {
             shownRef.current = true;
-            showToast("❌ Email təsdiqlənmədi və ya linkin vaxtı bitib.", "error");
-            window.history.replaceState({}, document.title, "/login");
+            showToast('❌ Email təsdiqlənmədi və ya linkin vaxtı bitib.', 'error');
+            window.history.replaceState({}, document.title, '/login');
         }
-    }, [verified]); // ⚠️ burda showToast YOXdur!
+    }, [verified]);
 
     const handleChange = (e) =>
     {
-        setFormData({
-            ...formData,
-            [e.target.name]: e.target.value,
-        });
+        setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
-    //google
-    const handleGoogleSuccess = async (credentialResponse) =>
-    {
-        console.log("GOOGLE SUCCESS", credentialResponse);
-        try
-        {
-            const idToken = credentialResponse?.credential; // ✅ IdToken burada gəlir
-            if (!idToken)
-            {
-                showToast("Google token alınmadı.", "error");
-                return;
-            }
-
-            const res = await authApi.googleSignIn(idToken);
-
-            // backend LoginResponce qaytarır: token/fullName/roles/email
-            const result = res.data;
-
-            if (!result?.token)
-            {
-                showToast("Google login alınmadı.", "error");
-                return;
-            }
-
-            const token = result.token;
-            const fullName = result.fullName || "";
-            const roles = JSON.stringify(result.roles || []);
-
-            // Səndəki flow: index.html-ə token ötürürsən
-            // const url =
-            //     "http://127.0.0.1:5500/index.html" +
-            //     `#token=${encodeURIComponent(token)}` +
-            //     `&name=${encodeURIComponent(fullName)}` +
-            //     `&roles=${encodeURIComponent(roles)}`;
-
-            // window.location.href = url;
-
-
-
-
-            //islemese bunu acc
-
-            //asagidaki
-
-
-
-
-
-
-
-
-
-
-
-            // const returnUrl = searchParams.get("returnUrl") || "http://127.0.0.1:5500/index.html";
-            // const url =
-            //     returnUrl +
-            //     `#token=${encodeURIComponent(token)}` +
-            //     `&name=${encodeURIComponent(fullName)}` +
-            //     `&roles=${encodeURIComponent(roles)}`;
-            // window.location.href = url;
-
-            const returnUrl = searchParams.get("returnUrl") || "http://localhost:5173/dashboard";
-            const url =
-                returnUrl +
-                `#token=${encodeURIComponent(token)}` +
-                `&name=${encodeURIComponent(fullName)}` +
-                `&roles=${encodeURIComponent(roles)}`;
-
-            window.location.href = url;
-        } catch (err)
-        {
-            const msg =
-                err?.response?.data?.message ||
-                err?.response?.data ||
-                err?.message ||
-                "Google login zamanı xəta baş verdi";
-            showToast(msg, "error");
-        }
-    };
-
-    const handleGoogleError = () =>
-    {
-        showToast("Google login alınmadı.", "error");
-    };
-
+    // ── Normal login ────────────────────────────────────────────────────────
     const handleSubmit = async (e) =>
     {
         e.preventDefault();
@@ -359,16 +521,17 @@ const Login = () =>
 
             if (!result?.success)
             {
-                showToast(result?.message || "Email və ya şifrə yanlışdır", "error");
+                showToast(result?.error || 'Email və ya şifrə yanlışdır', 'error');
                 return;
             }
 
+            // ✅ Redirect: template-ə hash ilə token ötür
             const token = result.token;
-            const fullName = result.fullName || "";
+            const fullName = result.fullName || '';
             const roles = JSON.stringify(result.roles || []);
 
             const url =
-                "http://127.0.0.1:5500/index.html" +
+                'http://127.0.0.1:5500/index.html' +
                 `#token=${encodeURIComponent(token)}` +
                 `&name=${encodeURIComponent(fullName)}` +
                 `&roles=${encodeURIComponent(roles)}`;
@@ -381,14 +544,63 @@ const Login = () =>
                 err?.response?.data?.message ||
                 err?.response?.data ||
                 err?.message ||
-                "Login zamanı xəta baş verdi";
-
-            showToast(msg, "error");
+                'Login zamanı xəta baş verdi';
+            showToast(msg, 'error');
         }
         finally
         {
             setLoading(false);
         }
+    };
+
+    // ── Google login ────────────────────────────────────────────────────────
+    const handleGoogleSuccess = async (credentialResponse) =>
+    {
+        try
+        {
+            const idToken = credentialResponse?.credential;
+            if (!idToken)
+            {
+                showToast('Google token alınmadı.', 'error');
+                return;
+            }
+
+            const res = await authApi.googleSignIn(idToken);
+            const result = res.data;
+
+            if (!result?.token)
+            {
+                showToast('Google login alınmadı.', 'error');
+                return;
+            }
+
+            // ✅ FIX: Hash redirect YOX.
+            //    loginWithGoogle() birbaşa AuthContext state-ini yeniləyir,
+            //    sonra navigate() ilə React Router vasitəsilə dashboard-a keçirik.
+            //    Bu sayədə:
+            //      • hashchange event problemi aradan qalxır
+            //      • page reload olmur
+            //      • race condition olmur
+            loginWithGoogle(result);
+
+            // returnUrl varsa istifadə et, yoxsa dashboard-a get
+            const returnPath = searchParams.get('returnUrl') || '/dashboard';
+            navigate(returnPath, { replace: true });
+        }
+        catch (err)
+        {
+            const msg =
+                err?.response?.data?.message ||
+                err?.response?.data ||
+                err?.message ||
+                'Google login zamanı xəta baş verdi';
+            showToast(msg, 'error');
+        }
+    };
+
+    const handleGoogleError = () =>
+    {
+        showToast('Google login alınmadı.', 'error');
     };
 
     return (
@@ -439,7 +651,7 @@ const Login = () =>
                 </form>
 
                 <div style={{ marginTop: 12 }}>
-                    <div style={{ display: "flex", justifyContent: "center" }}>
+                    <div style={{ display: 'flex', justifyContent: 'center' }}>
                         <GoogleLogin onSuccess={handleGoogleSuccess} onError={handleGoogleError} />
                     </div>
                 </div>
@@ -448,7 +660,6 @@ const Login = () =>
                     <p>
                         Don't have an account? <Link to="/register">Create one</Link>
                     </p>
-
                     <p style={{ marginTop: 8 }}>
                         <Link to="/forgot-password">Forgot password?</Link>
                     </p>

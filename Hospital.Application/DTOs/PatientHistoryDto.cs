@@ -27,7 +27,7 @@ namespace Hospital.Application.DTOs
 
     //  DTO for each Prescription 
     public class PrescriptionHistoryDto
-    {
+    { 
         public int Id { get; set; }
         public DateTime PrescriptionDate { get; set; }
         public List<string> Medicines { get; set; } 

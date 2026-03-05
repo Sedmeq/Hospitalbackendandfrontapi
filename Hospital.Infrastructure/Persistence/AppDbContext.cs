@@ -44,6 +44,9 @@ namespace Hospital.Infrastructure.Persistence
         public DbSet<DoctorSchedule> DoctorSchedules { get; set; }
         public DbSet<Faq> Faqs { get; set; }
 
+        public DbSet<LabResult> LabResults { get; set; }
+        public DbSet<LabResultItem> LabResultItems { get; set; }
+
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
         }
@@ -195,6 +198,65 @@ namespace Hospital.Infrastructure.Persistence
 
 
 
+
+
+            builder.Entity<LabResult>(entity =>
+      {
+          entity.HasKey(e => e.Id);
+
+          entity.Property(e => e.Title)
+                .IsRequired()
+                .HasMaxLength(200);
+
+          entity.Property(e => e.PdfPath)
+                .HasMaxLength(500);   // "lab-results/labresult_42_20250302143000.pdf"
+
+          entity.HasOne(e => e.Doctor)
+                .WithMany()
+                .HasForeignKey(e => e.DoctorId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+          entity.HasOne(e => e.Patient)
+                .WithMany()
+                .HasForeignKey(e => e.PatientId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+          entity.HasOne(e => e.Appointment)
+                .WithMany()
+                .HasForeignKey(e => e.AppointmentId)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.SetNull);
+      });
+
+            // ── LabResultItem ───────────────────────────────────────────
+            builder.Entity<LabResultItem>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.TestName)
+                      .IsRequired()
+                      .HasMaxLength(200);
+
+                entity.Property(e => e.Value)
+                      .IsRequired()
+                      .HasMaxLength(100);
+
+                entity.Property(e => e.Unit)
+                      .HasMaxLength(50);
+
+                entity.Property(e => e.ReferenceRange)
+                      .HasMaxLength(100);
+
+                entity.Property(e => e.Status)
+                      .IsRequired()
+                      .HasMaxLength(20)
+                      .HasDefaultValue("Normal");  // Normal | High | Low | Critical
+
+                entity.HasOne(e => e.LabResult)
+                      .WithMany(r => r.Items)
+                      .HasForeignKey(e => e.LabResultId)
+                      .OnDelete(DeleteBehavior.Cascade); // LabResult silindikdə Items-lər də silinir
+            });
 
         }
     }

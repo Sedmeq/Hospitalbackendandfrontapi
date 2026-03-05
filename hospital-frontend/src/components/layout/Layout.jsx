@@ -124,6 +124,9 @@
 import React, { useMemo, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+
+import { useVideoCallContext } from "../../context/VideoCallContext";
+import VideoCallRoom from "../VideoCall/VideoCallRoom"; // path-ını düzəlt
 import "./Layout.css";
 
 const Layout = ({ children }) =>
@@ -131,6 +134,9 @@ const Layout = ({ children }) =>
     const { user, logout, hasRole } = useAuth();
     const location = useLocation();
     const [sidebarOpen, setSidebarOpen] = useState(true);
+
+    const { incomingCall, activeCall, acceptCall, rejectCall, endCall } = useVideoCallContext();
+
 
     // hansı parent açıqdır
     const [openGroups, setOpenGroups] = useState({});
@@ -146,9 +152,27 @@ const Layout = ({ children }) =>
         window.location.href = "/login";
     };
 
+    // const handleGoToWebsite = () =>
+    // {
+    //     window.location.href = "http://127.0.0.1:5500/index.html";
+    // };
+
     const handleGoToWebsite = () =>
     {
-        window.location.href = "http://127.0.0.1:5500/index.html";
+        const token = localStorage.getItem('authToken') || '';
+        const fullName = localStorage.getItem('userName') || '';
+        const roles = localStorage.getItem('userRoles') || '[]';
+
+        // ✅ FIX: React (localhost:5173) ilə Novena (127.0.0.1:5500) fərqli
+        // origin-dir → localStorage paylaşılmır. Token MÜTLƏQ URL hash ilə
+        // ötürülməlidir (api-config.js bunu oxuyub öz localStorage-ına yazır).
+        const url =
+            'http://127.0.0.1:5500/index.html' +
+            `#token=${encodeURIComponent(token)}` +
+            `&name=${encodeURIComponent(fullName)}` +
+            `&roles=${encodeURIComponent(roles)}`;
+
+        window.location.href = url;
     };
 
     // ✅ Tree menu
@@ -176,6 +200,7 @@ const Layout = ({ children }) =>
                 ],
             },
             { path: "/appointments", label: "Appointments", icon: "📅", roles: ["Admin", "Doctor", "Patient"] },
+            { path: "/lab-results", label: "Lab Results", icon: "🧪", roles: ["Admin", "Doctor", "Patient"] },
             { path: "/chat", label: "AI Assistant", icon: "🤖", roles: ["Admin", "Doctor", "Patient"] },
 
 
@@ -297,6 +322,49 @@ const Layout = ({ children }) =>
 
                 <main className="content">{children}</main>
             </div>
+            {/* Incoming Call Modal */}
+            {incomingCall && (
+                <div style={{
+                    position: "fixed", inset: 0, zIndex: 99999,
+                    background: "rgba(0,0,0,0.7)",
+                    display: "flex", alignItems: "center", justifyContent: "center"
+                }}>
+                    <div style={{
+                        background: "#fff", borderRadius: 16, padding: 40,
+                        textAlign: "center", minWidth: 320, boxShadow: "0 20px 60px rgba(0,0,0,0.3)"
+                    }}>
+                        <div style={{ fontSize: 48, marginBottom: 16 }}>📞</div>
+                        <h2 style={{ marginBottom: 8 }}>Gələn Zəng</h2>
+                        <p style={{ color: "#666", marginBottom: 24 }}>
+                            <strong>{incomingCall.callerName}</strong> sizi video görüşə dəvət edir
+                        </p>
+                        <div style={{ display: "flex", gap: 12, justifyContent: "center" }}>
+                            <button onClick={rejectCall} style={{
+                                padding: "12px 24px", background: "#ef4444",
+                                color: "#fff", border: "none", borderRadius: 8, cursor: "pointer", fontSize: 16
+                            }}>
+                                ❌ Rədd et
+                            </button>
+                            <button onClick={acceptCall} style={{
+                                padding: "12px 24px", background: "#22c55e",
+                                color: "#fff", border: "none", borderRadius: 8, cursor: "pointer", fontSize: 16
+                            }}>
+                                ✅ Qəbul et
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Active Call Overlay */}
+            {activeCall && (
+                <div style={{ position: "fixed", inset: 0, zIndex: 99998 }}>
+                    <VideoCallRoom
+                        appointmentId={activeCall.appointmentId}
+                        onClose={endCall}
+                    />
+                </div>
+            )}
         </div>
     );
 };

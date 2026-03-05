@@ -52,5 +52,15 @@ namespace Hospital.API.Hubs
         public async Task EndCall(string appointmentId)
             => await Clients.OthersInGroup(appointmentId)
                             .SendAsync("CallEnded");
+
+
+        //new
+        // Mevcut koda əlavə et:
+        public override async Task OnDisconnectedAsync(Exception? exception)
+        {
+            // Əgər connection kəsilsə, həmin otaqdakılara bildiriş göndər
+            // (appointmentId-ni user state-də saxlamaq lazımdır)
+            await base.OnDisconnectedAsync(exception);
+        }
     }
 }

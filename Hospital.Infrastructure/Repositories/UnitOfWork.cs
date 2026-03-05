@@ -47,6 +47,9 @@ namespace Hospital.Infrastructure.Repositories
         public IDoctorScheduleRepository DoctorSchedules { get; private set; } // YENİ
         public IFaqRepository Faqs { get; private set; } // YENİ
 
+          public ILabResultRepository LabResults { get; }
+
+
 
         public UnitOfWork(
         AppDbContext context,
@@ -75,7 +78,8 @@ namespace Hospital.Infrastructure.Repositories
             IDoctorEducationRepository doctorEducations, // YENİ
         IDoctorSkillRepository doctorSkills,
         IFaqRepository faqs, // YENİ
-         IDoctorScheduleRepository doctorSchedules // YENİ
+         IDoctorScheduleRepository doctorSchedules, // YENİ
+         ILabResultRepository labResults // YENİ
         )
         {
             _context = context;
@@ -108,6 +112,7 @@ namespace Hospital.Infrastructure.Repositories
             Faqs = faqs; // YENİ
 
             DoctorSchedules = doctorSchedules; // YENİ
+            LabResults = labResults; // YENİ
         }
 
 

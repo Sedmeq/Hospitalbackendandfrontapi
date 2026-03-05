@@ -24,7 +24,25 @@ public class AssignRoleToUserCommandHandler : IRequestHandler<AssignRoleToUserCo
             throw new NotFoundException("User not found");
         }
 
-       
+
+        // Age validation: if this user has a Patient profile in DB, they must be at least 27
+        // (Role check is intentionally skipped — Patient role may have been removed but profile stays in DB)
+        if (request.RoleName == "Doctor")
+        {
+            var patient = await _unitOfWork.Patients.GetByUserIdAsync(user.Id);
+            if (patient != null)
+            {
+                var today = DateTime.Today;
+                int age = today.Year - patient.DateOfBirth.Year;
+                if (patient.DateOfBirth.Date > today.AddYears(-age)) age--;
+
+                if (age < 27)
+                    throw new BadRequestException(
+                        "Patient must be at least 27 years old to be assigned the Doctor role.");
+            }
+        }
+
+
         var result = await _userManager.AddToRoleAsync(user, request.RoleName);
         if (!result.Succeeded)
             return false; 

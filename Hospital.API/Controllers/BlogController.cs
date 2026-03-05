@@ -74,7 +74,7 @@ namespace Hospital.API.Controllers
         }
 
         [HttpPost("AddComment")]
-        [Authorize]
+        //[Authorize]
         public async Task<IActionResult> AddComment([FromBody] AddCommentToBlogCommand command)
         {
             var comment = await _mediator.Send(command);

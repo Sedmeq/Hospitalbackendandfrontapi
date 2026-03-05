@@ -44,4 +44,7 @@ export const appointmentApi = {
 
     // ✅ yeni: confirm
     confirmAppointment: (id) => axiosInstance.put(`/Appointment/ConfirmAppointment/${id}`),
+
+    getPatientsByDoctorId: (doctorId) =>
+        axiosInstance.get(`/Appointment/GetPatientsByDoctorId/${doctorId}`),
 };

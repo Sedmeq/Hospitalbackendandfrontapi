@@ -13,5 +13,9 @@ namespace Hospital.Application.Features.Blog.Command
         public int BlogId { get; set; }
         public string AuthorName { get; set; } = string.Empty;
         public string Content { get; set; } = string.Empty;
+
+        //new
+        public string VisitorEmail { get; set; }
+
     }
 }

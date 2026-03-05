@@ -44,6 +44,7 @@ namespace Hospital.Application.Features.Blog.Queries
                     BlogId = c.BlogId,
                     AuthorName = c.AuthorName,
                     Content = c.Content,
+                    VisitorEmail = c.VisitorEmail,
                     CreatedAt = c.CreatedAt
                 }).ToList()
             };

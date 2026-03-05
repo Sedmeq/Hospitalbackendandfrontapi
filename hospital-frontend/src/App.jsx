@@ -42,6 +42,11 @@ import ResetPassword from "./pages/auth/ResetPassword";
 import FaqList from "./pages/faq/FaqList";
 import Settings from "./pages/settings/Settings";
 
+import LabResultList from "./pages/labResult/LabResultList";
+
+import { VideoCallProvider } from './context/VideoCallContext';
+
+
 
 function HashTokenBridge()
 {
@@ -84,6 +89,7 @@ function App()
 {
     return (
         <AuthProvider>
+             <VideoCallProvider> 
             <BrowserRouter>
                 <Routes>
                     {/* Public Routes */}
@@ -157,6 +163,17 @@ function App()
                             <ProtectedRoute requiredRole="Admin">
                                 <Layout>
                                     <AboutSectionList />
+                                </Layout>
+                            </ProtectedRoute>
+                        }
+                    />
+
+                    <Route
+                        path="/lab-results"
+                        element={
+                            <ProtectedRoute requiredRole="Patient,Doctor,Admin">
+                                <Layout>
+                                    <LabResultList />
                                 </Layout>
                             </ProtectedRoute>
                         }
@@ -385,6 +402,7 @@ function App()
                     <Route path="*" element={<Navigate to="/dashboard" replace />} />
                 </Routes>
             </BrowserRouter>
+             </VideoCallProvider> 
         </AuthProvider>
     );
 }

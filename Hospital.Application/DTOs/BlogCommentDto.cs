@@ -12,6 +12,7 @@ namespace Hospital.Application.DTOs
         public int BlogId { get; set; }
         public string AuthorName { get; set; } = string.Empty;
         public string Content { get; set; } = string.Empty;
+        public string VisitorEmail { get; set; }
         public DateTime CreatedAt { get; set; }
     }
 }

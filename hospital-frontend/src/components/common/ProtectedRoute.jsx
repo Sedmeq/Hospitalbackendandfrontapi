@@ -26,35 +26,89 @@
 
 // export default ProtectedRoute;
 
+
+
+
+// import React from "react";
+// import { Navigate, useLocation } from "react-router-dom";
+// import { useAuth } from "../../context/AuthContext";
+// import LoadingSpinner from "./LoadingSpinner";
+
+// const ProtectedRoute = ({ children, requiredRole }) =>
+// {
+//     const { isAuthenticated, hasRole, loading } = useAuth();
+//     const location = useLocation();
+
+//     const storedToken = localStorage.getItem("authToken");
+//     const authed = isAuthenticated || !!storedToken;
+
+//     if (loading && !storedToken)
+//     {
+//         return <LoadingSpinner fullScreen />;
+//     }
+
+//     if (!authed)
+//     {
+//         return <Navigate to="/login" replace state={{ from: location }} />;
+//     }
+
+//     if (requiredRole && !hasRole(requiredRole))
+//     {
+//         return <Navigate to="/unauthorized" replace />;
+//     }
+
+//     return children;
+// };
+
+// export default ProtectedRoute;
+
+
+
+
+
+
+
 import React from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import LoadingSpinner from "./LoadingSpinner";
 
-const ProtectedRoute = ({ children, requiredRole }) =>
-{
-    const { isAuthenticated, hasRole, loading } = useAuth();
-    const location = useLocation();
+const normalizeRoles = (requiredRole) => {
+  if (!requiredRole) return [];
 
-    const storedToken = localStorage.getItem("authToken");
-    const authed = isAuthenticated || !!storedToken;
+  // requiredRole: string ola bilər ("Admin,Doctor") və ya array ola bilər
+  if (Array.isArray(requiredRole)) return requiredRole.map((x) => String(x).trim()).filter(Boolean);
 
-    if (loading && !storedToken)
-    {
-        return <LoadingSpinner fullScreen />;
-    }
+  return String(requiredRole)
+    .split(",")
+    .map((x) => x.trim())
+    .filter(Boolean);
+};
 
-    if (!authed)
-    {
-        return <Navigate to="/login" replace state={{ from: location }} />;
-    }
+const ProtectedRoute = ({ children, requiredRole }) => {
+  const { isAuthenticated, hasRole, loading } = useAuth();
+  const location = useLocation();
 
-    if (requiredRole && !hasRole(requiredRole))
-    {
-        return <Navigate to="/unauthorized" replace />;
-    }
+  const storedToken = localStorage.getItem("authToken");
+  const authed = isAuthenticated || !!storedToken;
 
-    return children;
+  if (loading && !storedToken) {
+    return <LoadingSpinner fullScreen />;
+  }
+
+  if (!authed) {
+    return <Navigate to="/login" replace state={{ from: location }} />;
+  }
+
+  const roles = normalizeRoles(requiredRole);
+
+  // roles verilibsə: onlardan hər hansı biri varsa OK
+  if (roles.length > 0) {
+    const ok = roles.some((r) => hasRole(r));
+    if (!ok) return <Navigate to="/unauthorized" replace />;
+  }
+
+  return children;
 };
 
 export default ProtectedRoute;

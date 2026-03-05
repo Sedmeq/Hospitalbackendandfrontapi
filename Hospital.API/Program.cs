@@ -1,3 +1,4 @@
+using DotNetEnv;
 using FluentValidation;
 using Hangfire;
 using Hospital.API.Hubs;
@@ -29,10 +30,13 @@ namespace Hospital.API
     {
         public static async Task Main(string[] args)
         {
+
+            Env.Load();
             //-------------------logerging configuration
             Log.Logger = new LoggerConfiguration()
                          .ReadFrom.Configuration(new ConfigurationBuilder()
                          .AddJsonFile("appsettings.json")
+                         .AddEnvironmentVariables()
                          .Build())
                          .CreateLogger();
 
@@ -43,6 +47,7 @@ namespace Hospital.API
 
                 var builder = WebApplication.CreateBuilder(args);
                 builder.Host.UseSerilog();
+                builder.Configuration.AddEnvironmentVariables();
                 // --- Add services to the container ---
                 builder.Services.AddControllers();
 
@@ -148,6 +153,9 @@ namespace Hospital.API
 
                 builder.Services.AddScoped<IPdfService, PdfService>();
                 builder.Services.AddScoped<IFaqRepository, FaqRepository>();
+
+                builder.Services.AddScoped<ILabResultRepository, LabResultRepository>();
+                builder.Services.AddScoped<ILabPdfService, LabPdfService>();
 
 
                 builder.Services.AddScoped<ITokenService, TokenService>();

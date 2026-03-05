@@ -18,6 +18,11 @@ namespace Hospital.Application.Features.Blog.Command
                 .NotEmpty().WithMessage("Author name is required.")
                 .MaximumLength(100).WithMessage("Author name must not exceed 100 characters.");
 
+            RuleFor(x => x.VisitorEmail)
+                .NotEmpty().WithMessage("Visitor email is required.")
+                .EmailAddress().WithMessage("Invalid email format.")
+                .MaximumLength(255).WithMessage("Email must not exceed 255 characters.");
+
             RuleFor(x => x.Content)
                 .NotEmpty().WithMessage("Comment content is required.")
                 .MinimumLength(5).WithMessage("Comment must be at least 5 characters.")

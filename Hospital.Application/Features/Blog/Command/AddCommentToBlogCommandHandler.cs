@@ -33,6 +33,7 @@ namespace Hospital.Application.Features.Blog.Command
                 BlogId = request.BlogId,
                 AuthorName = request.AuthorName,
                 Content = request.Content,
+                VisitorEmail = request.VisitorEmail,
                 CreatedAt = DateTime.Now
             };
 
@@ -50,6 +51,7 @@ namespace Hospital.Application.Features.Blog.Command
                 BlogId = comment.BlogId,
                 AuthorName = comment.AuthorName,
                 Content = comment.Content,
+                VisitorEmail = comment.VisitorEmail,
                 CreatedAt = comment.CreatedAt
             };
         }

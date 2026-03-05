@@ -12,6 +12,9 @@ namespace Hospital.Domain.Entities
         public int BlogId { get; set; }
         public virtual Blog? Blog { get; set; }
         public string AuthorName { get; set; } = string.Empty;
+
+        //new
+        public string VisitorEmail { get; set; }
         public string Content { get; set; } = string.Empty;
         public DateTime CreatedAt { get; set; } = DateTime.Now;
     }

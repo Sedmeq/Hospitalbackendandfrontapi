@@ -128,21 +128,24 @@ const BlogDetails = () =>
 
             {/* Comments */}
             <div className="card" style={{ padding: 20, marginTop: 20 }}>
-                <h3>Comments ({blog.commentCount})</h3>
+                <h3>Comments ({comments.length})</h3>
 
-                {blog.comments && blog.comments.length > 0 ? (
-                    blog.comments.map((c) => (
-                        <div
-                            key={c.id}
-                            style={{
-                                borderBottom: "1px solid #eee",
-                                padding: "10px 0",
-                            }}
-                        >
-                            <div style={{ fontWeight: 600 }}>{c.authorName}</div>
+                {comments.length > 0 ? (
+                    comments.map((c) => (
+                        <div key={c.id} style={{ borderBottom: "1px solid #eee", padding: "10px 0" }}>
+                            <div style={{ fontWeight: 600 }}>
+                                {c.authorName}
+                                {(c.visitorEmail || c.email || c.authorEmail) && (
+                                    <span style={{ fontWeight: 400, opacity: 0.7, marginLeft: 8 }}>
+                                        ({c.visitorEmail || c.email || c.authorEmail})
+                                    </span>
+                                )}
+                            </div>
+
                             <div style={{ fontSize: 13, opacity: 0.6 }}>
                                 {new Date(c.createdAt).toLocaleString()}
                             </div>
+
                             <div style={{ marginTop: 5 }}>{c.content}</div>
 
                             <button
@@ -152,8 +155,6 @@ const BlogDetails = () =>
                             >
                                 Delete
                             </button>
-
-
                         </div>
                     ))
                 ) : (
