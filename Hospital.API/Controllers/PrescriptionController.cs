@@ -1,46 +1,15 @@
-﻿using Hospital.Application.Features.Prescription.Command;
+﻿using Hospital.API.Hubs;
+using Hospital.Application.Features.Prescription.Command;
 using Hospital.Application.Features.Prescription.Queries;
 using Hospital.Application.Interfaces;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 
 namespace Hospital.API.Controllers
 {
-    //[Route("api/[controller]")]
-    //[ApiController]
-    //public class PrescriptionController : ControllerBase
-    //{
-    //    private readonly IMediator _mediator;
-    //    public PrescriptionController(IMediator mediator)
-    //    {
-    //        _mediator = mediator;
-    //    }
-
-    //    [HttpPost("Create-Prescription")]
-    //    public async Task<IActionResult> CreatePrescription([FromBody] CreatePrescriptionCommand command)
-    //    {
-    //        var response = await _mediator.Send(command);
-    //        return Ok(response);
-    //    }
-
-    //    [HttpGet("GetById/{id}")]
-    //    public async Task<IActionResult> GetPrescriptionById(int id)
-    //    {
-    //        var response = await _mediator.Send(new GetPrescriptionByIdQuery { PrescriptionId = id });
-    //        return Ok(response);
-    //    }
-
-    //    [HttpPost("prescriptions/dispense")]
-    //   // [Authorize(Roles = "Pharmacist")]
-    //    public async Task<IActionResult> DispensePrescription([FromBody] DispensePrescriptionCommand command)
-    //    {
-    //        var bill = await _mediator.Send(command);
-    //        return Ok(bill);
-    //    }
-
-
     [ApiController]
     [Route("api/[controller]")]
     [Authorize]
@@ -68,6 +37,24 @@ namespace Hospital.API.Controllers
         public async Task<IActionResult> Create([FromBody] CreatePrescriptionCommand command)
         {
             var result = await _mediator.Send(command);
+
+            // Patient-ə real-time & persistent notification
+            var appointment = await _unitOfWork.Appointments.GetByIdAsync(command.AppointmentId);
+            if (appointment?.PatientId.HasValue == true)
+            {
+                var patient = await _unitOfWork.Patients.GetByIdAsync(appointment.PatientId.Value);
+                if (patient?.ApplicationUserId != null)
+                {
+                    await _mediator.Send(new Hospital.Application.Features.Notification.Command.CreateNotificationCommand
+                    {
+                        ApplicationUserId = patient.ApplicationUserId,
+                        Type = "prescription",
+                        Title = "📝 Yeni Resept Yazıldı",
+                        Message = "Doktorunuz sizin üçün yeni resept yazdı. Lab Results bölməsindən yükləyə bilərsiniz."
+                    });
+                }
+            }
+
             return Ok(result);
         }
 

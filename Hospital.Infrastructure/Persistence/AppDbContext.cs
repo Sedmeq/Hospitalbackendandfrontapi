@@ -46,6 +46,8 @@ namespace Hospital.Infrastructure.Persistence
 
         public DbSet<LabResult> LabResults { get; set; }
         public DbSet<LabResultItem> LabResultItems { get; set; }
+        public DbSet<Notification> Notifications { get; set; } // <-- YENİ
+
 
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {

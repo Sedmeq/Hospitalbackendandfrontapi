@@ -1,10 +1,13 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using MediatR;
+﻿using Hospital.API.Hubs;
 using Hospital.Application.Features.Appointment.Command;
 using Hospital.Application.Features.Appointment.Queries;
-using Microsoft.AspNetCore.Authorization;
 using Hospital.Application.Features.Doctor.Queries;
+using Hospital.Application.Interfaces;
+using MediatR;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 
 
 namespace Hospital.API.Controllers
@@ -15,10 +18,13 @@ namespace Hospital.API.Controllers
     public class AppointmentController : ControllerBase
     {
         private readonly IMediator _mediator;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public AppointmentController(IMediator mediator)
+        public AppointmentController(IMediator mediator,
+            IUnitOfWork unitOfWork)
         {
             _mediator = mediator;
+            _unitOfWork = unitOfWork;
         }
 
         // Hər kəs öz appointment-ini yarada bilər
@@ -26,6 +32,24 @@ namespace Hospital.API.Controllers
         public async Task<IActionResult> BookAppointment([FromBody] BookAppointmentCommand command)
         {
             var result = await _mediator.Send(command);
+
+            // Doctor-a real-time & persistent notification göndər
+            var doctor = await _unitOfWork.Doctors.GetByIdAsync(result.DoctorId);
+            if (doctor?.ApplicationUserId != null)
+            {
+                var patientName = !string.IsNullOrEmpty(result.RegisteredPatientName)
+                    ? result.RegisteredPatientName
+                    : result.PatientName;
+
+                await _mediator.Send(new Hospital.Application.Features.Notification.Command.CreateNotificationCommand
+                {
+                    ApplicationUserId = doctor.ApplicationUserId,
+                    Type = "appointment",
+                    Title = "📅 Yeni Randevu",
+                    Message = $"Sizə {patientName} tərəfindən {result.Date:dd MMM yyyy} tarixi üçün yeni randevu yazıldı."
+                });
+            }
+
             return Ok(result);
         }
 
@@ -93,10 +117,27 @@ namespace Hospital.API.Controllers
 
 
         [HttpPut("ConfirmAppointment/{id}")]
-        [Authorize(Roles = "Admin,Doctor")]
+        [Authorize(Roles = "Doctor,Admin")]
         public async Task<IActionResult> ConfirmAppointment(int id)
         {
             var result = await _mediator.Send(new ConfirmAppointmentCommand { AppointmentId = id });
+
+            // Patient-ə real-time & persistent notification
+            if (result.PatientId.HasValue)
+            {
+                var patient = await _unitOfWork.Patients.GetByIdAsync(result.PatientId.Value);
+                if (patient?.ApplicationUserId != null)
+                {
+                    await _mediator.Send(new Hospital.Application.Features.Notification.Command.CreateNotificationCommand
+                    {
+                        ApplicationUserId = patient.ApplicationUserId,
+                        Type = "appointment",
+                        Title = "✅ Randevu Təsdiqləndi",
+                        Message = $"Sizin {result.Date:dd MMM yyyy} tarixli randevunuz təsdiqləndi."
+                    });
+                }
+            }
+
             return Ok(result);
         }
     }

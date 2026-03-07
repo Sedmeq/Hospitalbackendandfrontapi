@@ -48,6 +48,8 @@ namespace Hospital.Infrastructure.Repositories
         public IFaqRepository Faqs { get; private set; } // YENİ
 
           public ILabResultRepository LabResults { get; }
+        public INotificationRepository Notifications { get; private set; } // <-- YENİ
+
 
 
 
@@ -79,7 +81,8 @@ namespace Hospital.Infrastructure.Repositories
         IDoctorSkillRepository doctorSkills,
         IFaqRepository faqs, // YENİ
          IDoctorScheduleRepository doctorSchedules, // YENİ
-         ILabResultRepository labResults // YENİ
+         ILabResultRepository labResults ,// YENİ
+         INotificationRepository notificationRepository
         )
         {
             _context = context;
@@ -113,6 +116,7 @@ namespace Hospital.Infrastructure.Repositories
 
             DoctorSchedules = doctorSchedules; // YENİ
             LabResults = labResults; // YENİ
+            Notifications = notificationRepository;
         }
 
 

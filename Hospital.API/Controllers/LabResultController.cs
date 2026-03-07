@@ -1,9 +1,11 @@
-﻿using Hospital.Application.Features.LabResult.Command;
+﻿using Hospital.API.Hubs;
+using Hospital.Application.Features.LabResult.Command;
 using Hospital.Application.Features.LabResult.Queries;
 using Hospital.Application.Interfaces;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 
 namespace Hospital.API.Controllers
 {
@@ -37,6 +39,20 @@ namespace Hospital.API.Controllers
         public async Task<IActionResult> Create([FromBody] CreateLabResultCommand command)
         {
             var result = await _mediator.Send(command);
+
+            // Patient-ə real-time & persistent notification
+            var patient = await _unitOfWork.Patients.GetByIdAsync(result.PatientId);
+            if (patient?.ApplicationUserId != null)
+            {
+                await _mediator.Send(new Hospital.Application.Features.Notification.Command.CreateNotificationCommand
+                {
+                    ApplicationUserId = patient.ApplicationUserId,
+                    Type = "lab",
+                    Title = "🧪 Yeni Laboratoriya Nəticəsi",
+                    Message = $"'{result.Title}' adlı yeni lab nəticəniz hazırdır."
+                });
+            }
+
             return Ok(result);
         }
 

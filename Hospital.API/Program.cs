@@ -157,7 +157,8 @@ namespace Hospital.API
                 builder.Services.AddScoped<ILabResultRepository, LabResultRepository>();
                 builder.Services.AddScoped<ILabPdfService, LabPdfService>();
 
-
+                builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
+                builder.Services.AddScoped<ISignalRNotificationService, Hospital.API.Services.SignalRNotificationService>();
                 builder.Services.AddScoped<ITokenService, TokenService>();
                 builder.Services.AddScoped<IUserContextService, UserContextService>();
                 //builder.Services.AddScoped<IAIChatService, AIChatService>();
@@ -202,7 +203,8 @@ namespace Hospital.API
                             var path = context.HttpContext.Request.Path;
 
                             if (!string.IsNullOrEmpty(accessToken) &&
-                                path.StartsWithSegments("/hubs/videocall"))
+                                (path.StartsWithSegments("/hubs/videocall") ||
+                                 path.StartsWithSegments("/hubs/notifications")))
                             {
                                 context.Token = accessToken;
                             }
@@ -212,11 +214,11 @@ namespace Hospital.API
                     };
                 })
 
-                .AddGoogle(options =>                        
-                 {
-                     options.ClientId = builder.Configuration["Authentication:Google:ClientId"];
-                     options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
-                 });
+                .AddGoogle(options =>
+                {
+                    options.ClientId = builder.Configuration["Authentication:Google:ClientId"];
+                    options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+                });
 
                 // Swagger
                 builder.Services.AddEndpointsApiExplorer();
@@ -274,7 +276,7 @@ namespace Hospital.API
                     app.UseSwaggerUI(c =>
                     {
                         c.SwaggerEndpoint("/swagger/v1/swagger.json", "Hospital Management System API v1");
-                        c.RoutePrefix = "swagger"; 
+                        c.RoutePrefix = "swagger";
                         c.DocumentTitle = "API.Net";
                     });
                 }
@@ -295,6 +297,7 @@ namespace Hospital.API
                 app.UseMiddleware<TokenBlacklistMiddleware>();
                 app.UseAuthorization();
                 app.MapHub<VideoCallHub>("/hubs/videocall");
+                app.MapHub<NotificationHub>("/hubs/notifications");
 
 
                 app.MapControllers();

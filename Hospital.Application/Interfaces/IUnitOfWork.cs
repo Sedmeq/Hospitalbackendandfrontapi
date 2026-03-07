@@ -40,6 +40,7 @@ namespace Hospital.Application.Interfaces
         IFaqRepository Faqs { get; }
 
         ILabResultRepository LabResults { get; }
+        INotificationRepository Notifications { get; }
 
 
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
